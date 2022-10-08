@@ -48,13 +48,80 @@ window.addEventListener('DOMContentLoaded', DOMContentLoaded => {
         window.requestAnimationFrame(animate); 
     }, null, null); 
 
-    // LOAD MANSPLAINER
-    let mansplainer; 
-    loader.load('../assets/model/mansplainer.glb', gltf => {
-        scene.add(gltf.scene); 
-        mansplainer = scene.getObjectByName('mansplainer'); 
-        console.log('MANSPLAINER', scene.children[2]); 
+
+    // LOAD SAMPLE IMAGE AS PLANE
+    const MakeImage = (x, z) => {
+        const TestMat = new THREE.MeshBasicMaterial( { color: 0x0000ff }); 
+        const SampleImage_Plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), TestMat); 
+        SampleImage_Plane.material.side = THREE.DoubleSide; 
+        SampleImage_Plane.position.set(x, 2.5, z); 
+        scene.add(SampleImage_Plane); 
+        return SampleImage_Plane; 
+    }; 
+    const Locis = [
+        { 
+            url: '../assets/loci/0000_parker_prall_stace_greene.png', 
+            x: 20, 
+            z: 5, 
+            answer: 'parker prall stace greene', 
+        }, { 
+            url: '../assets/loci/0001_santayana_ducasse_cassirer_langer.png', 
+            x: 15, 
+            z: -5, 
+            answer: 'santayana ducasse cassirer langer', 
+        }, { 
+            url: '../assets/loci/0002.png', 
+            x: 15, 
+            z: -25, 
+            answer: 'dilman gotshalk arnold isenberg', 
+        }, { 
+            url: '../assets/loci/0003.png', 
+            x: 25, 
+            z: -25, 
+            answer: 'monroe beardsley nelson goodman', 
+        }
+    ]; 
+    Locis.forEach(loci => {
+        loci.object = MakeImage(loci.x, loci.z); 
+        loci.answered = false; 
     }); 
+
+    document.addEventListener('keydown', DocumentKeydown => {
+        if(DocumentKeydown.key === 'Enter') {
+            console.log('ENTER'); 
+            let ClosestIndex = -1; 
+            Locis.forEach((loci, index) => {
+                const GetDistance = (x, z) => (x - player.position.x) ** 2 + (z - player.position.z) ** 2; 
+                if(ClosestIndex === -1) {
+                    ClosestIndex = index; 
+                } else {
+                    if(GetDistance(loci.x, loci.z) < GetDistance(Locis[ClosestIndex].x, Locis[ClosestIndex].z)) {
+                        ClosestIndex = index; 
+                    }
+                    
+                }
+            }); 
+            
+            const submission = document.querySelector('.splain').innerText; 
+            if(submission === Locis[ClosestIndex].answer) {
+                if(!Locis[ClosestIndex].answered) {
+                    Locis[ClosestIndex].answered = true; 
+    
+                    const SampleImage_Texture = THREE.ImageUtils.loadTexture(Locis[ClosestIndex].url); 
+                    SampleImage_Texture.wrapS = THREE.RepeatWrapping; 
+                    SampleImage_Texture.wrapT = THREE.RepeatWrapping; 
+                    SampleImage_Texture.repeat.set( 1, 1 ); 
+                    const SampleImage_Material = new THREE.MeshLambertMaterial( { map: SampleImage_Texture } ); 
+                    SampleImage_Material.side = THREE.DoubleSide; 
+                    Locis[ClosestIndex].object.material = SampleImage_Material; 
+                }
+
+                console.log('CO RECT'); 
+            }
+            
+        }
+    }); 
+
 
     // KEYBOARD
     const input = {
@@ -66,6 +133,10 @@ window.addEventListener('DOMContentLoaded', DOMContentLoaded => {
         ' ': false, 
     }; 
     document.addEventListener('keydown', keydown => {
+        if(document.activeElement.classList.contains('splain')) {
+            return; 
+        }
+        
         if(input.hasOwnProperty(keydown.key)) {
             input[keydown.key] = true; 
         }
