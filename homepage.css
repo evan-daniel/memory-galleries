@@ -14,89 +14,20 @@
 }
 
 body {
+    position: fixed; 
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0; 
+    
     font-family: 'Futura'; 
 }
 
-/* INTRODUCTION */
+/* SPACE-BUILDER */
 
-.introduction {
-    margin: 0 0 2rem; 
-    padding: 8rem 2rem; 
-    
-    background-color: #008; 
-    background: url('assets/img/duke_nukem.jpg'); 
-    background-size: cover; 
-    background-position: center; 
-    background-repeat: no-repeat;
-}
+.space-builder {
+    width: 100vmin; 
+    height: 100vmin; 
 
-.pre-title {
-    font-size: 2rem; 
-    font-weight: 500; 
-    color: #FFF8; 
-}
-
-.title {
-    font-size: 4rem;
-    font-weight: 700; 
-    text-align: center; 
-    text-transform: uppercase; 
-    color: #FFF8; 
-
-    
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-}
-
-/* LINKS */
-
-@keyframes button-active {
-    0% {
-        background-color: #0F0; 
-    }
-
-    50% {
-        background-color: #FF0; 
-    }
-}
-
-.game,
-.tutorial {
-    margin: 2rem; 
-    padding: 1rem; 
-    
-    border-radius: 1rem; 
-    
-    font-size: 3rem; 
-    font-weight: 700; 
-    color: #008; 
-    background-color: #0F0; 
-    text-decoration: none;
-    
-    display: flex; 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; 
-}
-
-.tutorial {
-    animation: 1s button-active infinite; 
-
-    cursor: crosshair;
-}
-
-.tutorial .note {
-    margin: -0.66rem 0 0; 
-    
-    font-size: 2rem; 
-}
-
-.tutorial .note em {
-    /* text-transform: uppercase;  */
-}
-
-.game {
-    color: #0084; 
-    background-color: #8888; 
+    background-color: #faf;
 }
