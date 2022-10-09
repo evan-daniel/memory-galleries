@@ -15,11 +15,13 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     document.querySelector('.map').append(map); 
 
-    document.querySelector('.map').addEventListener('click', clickRoom => {
+    const roomActivation = clickRoom => {
         const room = clickRoom.target; 
-
-        if(room.classList.contains('room')) {
+        console.log(clickRoom)
+        if(room.classList.contains('room') && clickRoom.buttons === 1) {
             room.setAttribute('active', room.getAttribute('active') !== 'true'); 
         }
-    }); 
+    }
+    document.querySelector('.map').addEventListener('mousedown', roomActivation); 
+    document.querySelector('.map').addEventListener('mouseover', roomActivation); 
 }); 

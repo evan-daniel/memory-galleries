@@ -28,7 +28,8 @@ window.addEventListener('DOMContentLoaded', DOMContentLoaded => {
     const loader = new GLTFLoader(); 
     let player; 
     loader.load('../assets/model/tutorial-scene.glb', gltf => {
-        scene.add(gltf.scene); 
+        player = gltf.scene.getObjectByName('player_ephemeral'); 
+        scene.add(player); 
         scene.traverse(node => {
             if(node instanceof THREE.Mesh) {
                 node.castShadow = true; 
@@ -36,7 +37,6 @@ window.addEventListener('DOMContentLoaded', DOMContentLoaded => {
                 
             }
         }); 
-        player = scene.getObjectByName('player_ephemeral'); 
         player.traverse(node => {
             if(node instanceof THREE.Mesh) {
                 node.castShadow = false; 
@@ -47,6 +47,14 @@ window.addEventListener('DOMContentLoaded', DOMContentLoaded => {
         camera.position.set(0, 1, -0.5); 
         window.requestAnimationFrame(animate); 
     }, null, null); 
+
+    // GROUND
+
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial( { color: 0x00ff00 } )); 
+    ground.material.side = THREE.DoubleSide; 
+    ground.position.set(0, 0, 0); 
+    ground.rotation.x = - Math.PI / 2; 
+    scene.add(ground); 
 
 
     // LOAD SAMPLE IMAGE AS PLANE
@@ -195,7 +203,7 @@ window.addEventListener('DOMContentLoaded', DOMContentLoaded => {
         const platform_detector = new THREE.Raycaster(player.position, new THREE.Vector3(0, -1, 0)); 
         const platform_below = platform_detector.intersectObjects(scene.children, true); 
         const GRAVITY = 0.01, JUMP_STRENGTH = 0.3, HOVER = 0.01; 
-        vy -= GRAVITY; 
+        // vy -= GRAVITY; 
         platform_below.forEach(platform => {
             if(platform.object.name.indexOf('platform') !== -1 && platform.distance <= -vy + 2 * HOVER) {
                 vy = 0; 
