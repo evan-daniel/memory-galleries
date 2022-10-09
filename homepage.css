@@ -2,6 +2,8 @@
 
 :root {
     box-sizing: border-box;
+
+    --rooms-per-side: 1; 
 }
 
 *, 
@@ -23,11 +25,23 @@ body {
     font-family: 'Futura'; 
 }
 
-/* SPACE-BUILDER */
+/* MAP */
 
-.space-builder {
+.map {
     width: 100vmin; 
     height: 100vmin; 
 
     background-color: #faf;
+
+    display: grid; 
+    grid-template-columns: repeat(var(--rooms-per-side), 1fr);
+    grid-template-rows: repeat(var(--rooms-per-side), 1fr);
+}
+
+/* ROOMS */
+
+.room {
+    background-color: #ccc; 
+    
+    border: 1px solid #000; 
 }
