@@ -14,4 +14,12 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
     document.querySelector('.map').append(map); 
+
+    document.querySelector('.map').addEventListener('click', clickRoom => {
+        const room = clickRoom.target; 
+
+        if(room.classList.contains('room')) {
+            room.setAttribute('active', room.getAttribute('active') !== 'true'); 
+        }
+    }); 
 }); 
