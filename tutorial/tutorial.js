@@ -3,7 +3,11 @@ import { GLTFLoader } from '../lib/GLTFLoader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
 
+    // VARIABLES
+    
     const rooms = JSON.parse(localStorage.getItem('rooms')); 
+    const WallWidth = 10; 
+    const WallHeight = 10; 
     
     // INIT
     const renderer = new THREE.WebGLRenderer({ 
@@ -53,9 +57,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // GROUND
 
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial( { color: 0x00ff00 } )); 
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(WallWidth * 16, WallWidth * 16), new THREE.MeshBasicMaterial( { color: 0x00ff00 } )); 
     ground.material.side = THREE.DoubleSide; 
-    ground.position.set(0, 0, 0); 
+    ground.position.set(WallWidth * 8, 0, WallWidth * 8); 
     ground.rotation.x = - Math.PI / 2; 
     scene.add(ground); 
 
@@ -65,25 +69,31 @@ window.addEventListener('DOMContentLoaded', () => {
     WallMaterial.side = THREE.DoubleSide; 
     const BlueWallMaterial = new THREE.MeshBasicMaterial( { color: 0xCCCCFF }); 
     BlueWallMaterial.side = THREE.DoubleSide; 
-    const WallWidth = 10; 
-    const WallHeight = 10; 
-    const WallTemplate = new THREE.Mesh(new THREE.PlaneGeometry(WallWidth * 0.9, WallHeight * 0.9), WallMaterial); 
+    const WallTemplate = new THREE.Mesh(new THREE.PlaneGeometry(WallWidth * 0.99, WallHeight * 0.99), WallMaterial); 
     console.log(rooms); 
     for(let y = 0; y < rooms.length; ++y) {
         for(let x = 0; x < rooms[0].length; ++x) {
-            if(rooms[y][x].active === false && rooms[y][x + 1]?.active === false) {
-                console.log('TRUE'); 
+
+            // WEST WALL
+            
+            if(x === 0 || !rooms[y][x - 1].active || !rooms[y][x].active) {
                 const EastWall = WallTemplate.clone(); 
                 EastWall.rotation.y = Math.PI / 2; 
-                EastWall.position.set(x * WallWidth + WallWidth / 2, 2.5, y * WallWidth + WallWidth / 2); 
+                EastWall.position.set(x * WallWidth - WallWidth / 2, WallHeight / 2, y * WallWidth + WallWidth / 2); 
                 scene.add(EastWall); 
             }
-            const Wall = WallTemplate.clone(); 
-            if(y === 0 && x === 1) {
-                Wall.material = BlueWallMaterial; 
+
+            // NORTH WALL
+            
+            if(y === 0 || !rooms[y - 1][x].active || !rooms[y][x].active ) {
+                const Wall = WallTemplate.clone(); 
+                if(y === 0 && x === 1) {
+                    Wall.material = BlueWallMaterial; 
+                }
+                Wall.position.set(x * WallWidth, WallHeight / 2, y * WallWidth); 
+                scene.add(Wall); 
+
             }
-            Wall.position.set(x * WallWidth, 2.5, y * WallWidth); 
-            scene.add(Wall); 
         }
     }
 
