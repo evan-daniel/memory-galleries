@@ -12,6 +12,11 @@
     box-sizing: inherit; 
     margin: 0; 
     padding: 0; 
+
+    background-size: cover; 
+    background-repeat: no-repeat;
+    background-position: center; 
+    
     outline: 0; 
 }
 
@@ -22,20 +27,35 @@ body {
     bottom: 0; 
     left: 0; 
     
-    font-family: 'Futura'; 
+    font-family: 'Futura', sans-serif; 
+}
+
+a {
+    text-decoration: none;
+    color: #00f; 
+}
+
+/* SCHEMATIC CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
+
+.schematic {
+    display: flex; 
 }
 
 /* INTERFACE */
 
 .interface {
+    flex: 0 1 100%; 
+    
     background-color: #aaf;
 
     display: flex; 
+    flex-direction: column; 
 }
 
 /* MAP */
 
-.map {
+.floor-plan {
+    flex: 1 0 100vmin; 
     width: 100vmin; 
     height: 100vmin; 
 
@@ -73,15 +93,50 @@ body {
 
 /* START */
 
-.drop-area, 
-.start-link {
+.start-button {
     background-color: #888; 
-    width: 16rem; 
-    height: 16rem; 
+    width: 8rem; 
+    height: 4rem; 
 
     border-radius: 16rem; 
 
     display: flex; 
     justify-content: center;
     align-items: center;
+}
+
+/* LOCI DATA */
+
+.memories {
+    flex: 1 1 100%; 
+    
+    background-color: #aaa; 
+
+    display: flex; 
+    flex-wrap: wrap;
+}
+
+.memory {
+    flex: 0 1 33%; 
+    height: 33%; 
+
+    background-color: #888; 
+    
+    border: 1px solid #000; 
+
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.memory[blank="true"] {
+
+}
+
+/* CANVAS */
+/* TEST FOR STORAGE */
+
+canvas {
+    background-color: #0f0; 
 }

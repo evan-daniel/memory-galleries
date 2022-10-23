@@ -1,6 +1,38 @@
-window.addEventListener('DOMContentLoaded', () => {
+import Palace from './lib/Palace.js'; 
+
+window.addEventListener('DOMContentLoaded', async () => {
     const roomsPerSide = 16; 
     document.documentElement.style.setProperty('--rooms-per-side', `${roomsPerSide}`); 
+
+    // DATA
+
+    let palace = new Palace(); 
+    await palace.Build(); 
+    console.log(palace); 
+
+    for(let i = 0; i < palace.MemoryCount; ++i) {
+        const template = document.querySelector('template[type="memory"]'); 
+        const memory = template.content; 
+        memory.querySelector('.assertion').innerText = palace.Memories[i].assertion; 
+        document.querySelector('.memories').prepend(memory); 
+
+        const imgFile = await palace.Storage.MemoryImages.getFileHandle(`${palace.Memories[i].id}.${palace.Memories[i].extension}`);
+        const memoryImg = await imgFile.getFile();
+        const rdr = new FileReader(); 
+
+        rdr.addEventListener('load', load => {
+            const res = rdr.result; 
+            document.querySelector('.memory').style.backgroundImage = `URL("${res}")`; 
+        }); 
+        rdr.readAsDataURL(memoryImg); 
+
+        
+    }
+
+    // STORAGE
+
+    const rootDirectory = await navigator.storage.getDirectory(); 
+    loadPngFromOriginPrivateFileSystemIntoCanvas(rootDirectory, document.querySelector('#myCanvas')); 
     
     // INIT
     
@@ -46,11 +78,11 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    document.querySelector('.map').append(roomsDom); 
+    document.querySelector('.floor-plan').append(roomsDom); 
     
     // MAP
     
-    const map_RoomsDom_To_Rooms = () => {
+    const parse_FloorPlan = () => {
         document.querySelectorAll('.room').forEach(room => {
             rooms[+room.getAttribute('row')][+room.getAttribute('column')].active = room.getAttribute('active') === 'true'; 
         }); 
@@ -64,39 +96,61 @@ window.addEventListener('DOMContentLoaded', () => {
         if(room.classList.contains('room') && clickRoom.buttons === 1) {
             room.setAttribute('active', room.getAttribute('active') !== 'true'); 
 
-            map_RoomsDom_To_Rooms(); 
+            parse_FloorPlan(); 
             localStorage.setItem('rooms', JSON.stringify(rooms)); 
         }
     }
-    document.querySelector('.map').addEventListener('mousedown', roomActivation); 
-    document.querySelector('.map').addEventListener('mouseover', roomActivation); 
+    document.querySelector('.floor-plan').addEventListener('mousedown', roomActivation); 
+    document.querySelector('.floor-plan').addEventListener('mouseover', roomActivation); 
 
-    // DROP FILES
-
-    // document.querySelector('.drop-area').addEventListener('dragover', drag => {
-    //     drag.stopPropagation(); 
-    //     drag.preventDefault(); 
-    //     console.log(drag); 
-
-    //     drag.dataTransfer.dropEffect = 'copy'; 
-    // }); 
-
-    // document.querySelector('.drop-area').addEventListener('drop', drop => {
-    //     drop.stopPropagation(); 
-    //     drop.preventDefault(); 
-    //     console.log('DROP EVENT', drop); 
-    //     console.log(drop.dataTransfer.fileList[0]); 
-    // }); 
-
-    document.querySelector('.drop-area').addEventListener('change', change => {
+    document.querySelector('.memory').addEventListener('change', async change => {
         console.log(change); 
         const reader = new FileReader(); 
         reader.addEventListener('load', load => {
             const res = reader.result; 
-            document.querySelector('.drop-area').style.backgroundImage = `URL("${res}")`; 
+            document.querySelector('.memory').style.backgroundImage = `URL("${res}")`; 
         }); 
-        reader.readAsDataURL(document.querySelector('.drop-area').files[0]); 
+        reader.readAsDataURL(document.querySelector('.memory').files[0]); 
+
+        const tmpDirectory = await rootDirectory.getDirectoryHandle('tmp', { 'create': true }); 
+        const tmpFile = await tmpDirectory.getFileHandle('tst_file.png', { 'create': true }); 
+        const tmpWtr = await tmpFile.createWritable(); 
+        try {
+            await tmpWtr.write( document.querySelector('.memory').files[0] );
+        }
+        finally {
+            await tmpWtr.close();
+        }
+        
     })
 
-    console.log(chrome.storage.local.QUOTA_BYTES); 
 }); 
+
+
+async function loadPngFromOriginPrivateFileSystemIntoCanvas( storageRoot, canvasElem ) {
+    
+    const artSubDir = await storageRoot.getDirectoryHandle( "tmp" );
+    const savedFile = await artSubDir.getFileHandle( "tst_file.png" ); // Surprisingly there isn't a "fileExists()" function: instead you need to iterate over all files, which is odd... https://wicg.github.io/file-system-access/
+    
+    // Get the `savedFile` as a DOM `File` object (as opposed to a `FileSystemFileHandle` object):
+    const pngFile = await savedFile.getFile();
+    
+    // Load it into an ImageBitmap object which can be painted directly onto the <canvas>. You don't need to use URL.createObjectURL and <img/> anymore. See https://developer.mozilla.org/en-US/docs/Web/API/createImageBitmap
+    // But you *do* still need to `.close()` the ImageBitmap after it's painted otherwise you'll leak memory. Use a try/finally block for that.
+    try {
+        const loadedBitmap = await createImageBitmap( pngFile ); // `createImageBitmap()` is a global free-function, like `parseInt()`. Which is unusual as most modern JS APIs are designed to not pollute the global scope.
+        try {
+            const ctx = canvasElem.getContext('2d');
+            ctx.clearRect( /*x:*/ 0, /*y:*/ 0, ctx.canvas.width, ctx.canvas.height ); // Clear the canvas before drawing the loaded image.
+            ctx.drawImage( loadedBitmap, /*x:*/ 0, /*y:*/ 0 ); // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+        }
+        finally {
+            loadedBitmap.close(); // https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close
+        }
+    }
+    catch( err ) {
+        console.error( err );
+        alert( "Couldn't load previously saved image into <canvas>. See browser console.\n\n" + err );
+        return;
+    }
+}

@@ -11,12 +11,29 @@
     <body>
         <!-- <canvas class="space-builder"></canvas> -->
 
-        <div class="interface">
-            <div class="map"></div>
-    
-            <a class="start-link" href="/tutorial">START</a>
-            <input type="file" class="drop-area" accept="image/jpeg, image/png, image/jpg">
+        <div class="schematic">
+            <div class="floor-plan"></div>
+
+            <div class="interface">
+                <a class="start-button" href="/tutorial">START</a>
+
+                <canvas id="myCanvas"></canvas>
+                
+                <div class="memories">
+                    <input class="memory" type="file" accept="image/jpeg, image/png, image/jpg">
+                </div>
+            </div>
         </div>
         
+        <template type="memory">
+            <div class="memory">
+                <div class="memory-img">
+                    TEST MEMORY
+                </div>
+                <div class="assertion">
+                    NONE
+                </div>
+            </div>
+        </template>
     </body>
 </html>
