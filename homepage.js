@@ -12,8 +12,19 @@ window.addEventListener('DOMContentLoaded', () => {
                 column: x, 
                 row: y, 
                 active: false, 
+                loci: { 
+                    north: undefined, 
+                    east: undefined, 
+                    south: undefined, 
+                    west: undefined, 
+                }, 
             }; 
         }
+    }
+    rooms[0][0].loci.south = { 
+        url: '/mnt/file.jpg', 
+        ans: 'coefficient of static friction', 
+        active: false, 
     }
 
     // INIT
@@ -27,6 +38,12 @@ window.addEventListener('DOMContentLoaded', () => {
             room.setAttribute('row', y);
             room.setAttribute('active', false);  
             roomsDom.appendChild(room); 
+
+            if(rooms[y][x].loci.south) {
+                const loci = document.createElement('div'); 
+                loci.classList.add('loci', 'loci-north'); 
+                room.appendChild(loci); 
+            }
         }
     }
     document.querySelector('.map').append(roomsDom); 
@@ -53,4 +70,33 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     document.querySelector('.map').addEventListener('mousedown', roomActivation); 
     document.querySelector('.map').addEventListener('mouseover', roomActivation); 
+
+    // DROP FILES
+
+    // document.querySelector('.drop-area').addEventListener('dragover', drag => {
+    //     drag.stopPropagation(); 
+    //     drag.preventDefault(); 
+    //     console.log(drag); 
+
+    //     drag.dataTransfer.dropEffect = 'copy'; 
+    // }); 
+
+    // document.querySelector('.drop-area').addEventListener('drop', drop => {
+    //     drop.stopPropagation(); 
+    //     drop.preventDefault(); 
+    //     console.log('DROP EVENT', drop); 
+    //     console.log(drop.dataTransfer.fileList[0]); 
+    // }); 
+
+    document.querySelector('.drop-area').addEventListener('change', change => {
+        console.log(change); 
+        const reader = new FileReader(); 
+        reader.addEventListener('load', load => {
+            const res = reader.result; 
+            document.querySelector('.drop-area').style.backgroundImage = `URL("${res}")`; 
+        }); 
+        reader.readAsDataURL(document.querySelector('.drop-area').files[0]); 
+    })
+
+    console.log(chrome.storage.local.QUOTA_BYTES); 
 }); 

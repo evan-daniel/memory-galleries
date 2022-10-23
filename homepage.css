@@ -25,6 +25,14 @@ body {
     font-family: 'Futura'; 
 }
 
+/* INTERFACE */
+
+.interface {
+    background-color: #aaf;
+
+    display: flex; 
+}
+
 /* MAP */
 
 .map {
@@ -44,7 +52,36 @@ body {
     background-color: #888; 
     
     border: 1px solid #000; 
+
+    display: relative; 
 }
 .room[active = 'true'] {
     background-color: #ccf; 
+}
+
+/* LOCI */
+
+.loci {
+    display: absolute; 
+    top: 0; 
+    right: 0; 
+    left: 0; 
+    height: 16px; 
+
+    background-color: #aaf; 
+}
+
+/* START */
+
+.drop-area, 
+.start-link {
+    background-color: #888; 
+    width: 16rem; 
+    height: 16rem; 
+
+    border-radius: 16rem; 
+
+    display: flex; 
+    justify-content: center;
+    align-items: center;
 }
