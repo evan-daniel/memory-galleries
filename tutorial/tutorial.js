@@ -1,13 +1,19 @@
 import * as THREE from '../lib/three.module.js'; 
 import { GLTFLoader } from '../lib/GLTFLoader.js'; 
 
-window.addEventListener('DOMContentLoaded', () => {
+import Palace from '../lib/Palace.js'; 
+
+window.addEventListener('DOMContentLoaded', async () => {
 
     // VARIABLES
     
-    const rooms = JSON.parse(localStorage.getItem('rooms')); 
+    const _palace = new Palace(); 
+    _palace.Build(); 
+    const palace = JSON.parse(localStorage.getItem('palace')); 
+    const rooms = palace.Rooms; 
     const WallWidth = 10; 
     const WallHeight = 10; 
+    console.log('PALACE', palace); 
     
     // INIT
     const renderer = new THREE.WebGLRenderer({ 
@@ -70,7 +76,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const BlueWallMaterial = new THREE.MeshBasicMaterial( { color: 0xCCCCFF }); 
     BlueWallMaterial.side = THREE.DoubleSide; 
     const WallTemplate = new THREE.Mesh(new THREE.PlaneGeometry(WallWidth * 0.99, WallHeight * 0.99), WallMaterial); 
-    console.log(rooms); 
     for(let y = 0; y < rooms.length; ++y) {
         for(let x = 0; x < rooms[0].length; ++x) {
 
@@ -106,9 +111,10 @@ window.addEventListener('DOMContentLoaded', () => {
         scene.add(SampleImage_Plane); 
         return SampleImage_Plane; 
     }; 
+    
     const Locis = [
         { 
-            url: '../assets/loci/0000_parker_prall_stace_greene.png', 
+            url: '', 
             x: 20, 
             z: 5, 
             answer: 'parker prall stace greene', 
@@ -129,12 +135,13 @@ window.addEventListener('DOMContentLoaded', () => {
             answer: 'monroe beardsley nelson goodman', 
         }
     ]; 
+    
     Locis.forEach(loci => {
         loci.object = MakeImage(loci.x, loci.z); 
         loci.answered = false; 
     }); 
 
-    document.addEventListener('keydown', DocumentKeydown => {
+    document.addEventListener('keydown', async DocumentKeydown => {
         if(DocumentKeydown.key === 'Enter') {
             console.log('ENTER'); 
             let ClosestIndex = -1; 
@@ -155,13 +162,23 @@ window.addEventListener('DOMContentLoaded', () => {
                 if(!Locis[ClosestIndex].answered) {
                     Locis[ClosestIndex].answered = true; 
     
-                    const SampleImage_Texture = THREE.ImageUtils.loadTexture(Locis[ClosestIndex].url); 
-                    SampleImage_Texture.wrapS = THREE.RepeatWrapping; 
-                    SampleImage_Texture.wrapT = THREE.RepeatWrapping; 
-                    SampleImage_Texture.repeat.set( 1, 1 ); 
-                    const SampleImage_Material = new THREE.MeshLambertMaterial( { map: SampleImage_Texture } ); 
-                    SampleImage_Material.side = THREE.DoubleSide; 
-                    Locis[ClosestIndex].object.material = SampleImage_Material; 
+                    // FROM STORAGE
+                    
+                    const imgFile = await _palace.Storage.MemoryImages.getFileHandle(`0.png`);
+                    const memoryImg = await imgFile.getFile();
+                    const rdr = new FileReader(); 
+                    rdr.addEventListener('load', load => {
+                        const res = rdr.result; 
+
+                        const SampleImage_Texture = THREE.ImageUtils.loadTexture(res); 
+                        SampleImage_Texture.wrapS = THREE.RepeatWrapping; 
+                        SampleImage_Texture.wrapT = THREE.RepeatWrapping; 
+                        SampleImage_Texture.repeat.set( 1, 1 ); 
+                        const SampleImage_Material = new THREE.MeshLambertMaterial( { map: SampleImage_Texture } ); 
+                        SampleImage_Material.side = THREE.DoubleSide; 
+                        Locis[ClosestIndex].object.material = SampleImage_Material; 
+                    }); 
+                    rdr.readAsDataURL(memoryImg); 
                 }
 
                 console.log('CO RECT'); 
