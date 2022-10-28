@@ -91,13 +91,23 @@ a {
     background-color: #aaf; 
 }
 
+/* BUTTONS */
+
+.buttons {
+    display: flex; 
+}
+
 /* START */
 
+.clear, 
 .start-button {
-    background-color: #888; 
     width: 8rem; 
     height: 4rem; 
-
+    
+    color: #00F; 
+    background-color: #888; 
+    
+    cursor: pointer; 
     border-radius: 16rem; 
 
     display: flex; 
@@ -114,9 +124,12 @@ a {
 
     display: flex; 
     flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start; 
 }
 
 .memory {
+    position: relative; 
     flex: 0 1 33%; 
     height: 33%; 
 
@@ -130,13 +143,24 @@ a {
     align-items: center;
 }
 
-.memory[blank="true"] {
-
+.memory-img {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0; 
 }
 
-/* CANVAS */
-/* TEST FOR STORAGE */
+.assertion {
+    position: absolute; 
+    right: 0; 
+    bottom: 0; 
+    left: 0; 
+    height: 2.4em; 
 
-canvas {
-    background-color: #0f0; 
+    background-color: #cece; 
+
+    display: flex; 
+    justify-content: center;
+    align-items: center;
 }

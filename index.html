@@ -15,7 +15,10 @@
             <div class="floor-plan"></div>
 
             <div class="interface">
-                <a class="start-button" href="/tutorial">START</a>
+                <div class="buttons">
+                    <a class="start-button" href="/tutorial">START</a>
+                    <div class="clear">CLEAR</div>
+                </div>
 
                 <div class="memories">
                     <input class="memory" type="file" accept="image/jpeg, image/png, image/jpg">
@@ -25,11 +28,9 @@
         
         <template type="memory">
             <div class="memory">
-                <div class="memory-img">
-                    TEST MEMORY
-                </div>
-                <div class="assertion">
-                    NONE
+                <div class="memory-img"></div>
+                <div class="assertion" contenteditable="true">
+                    NOT ASSERTIVE
                 </div>
             </div>
         </template>

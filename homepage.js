@@ -4,42 +4,75 @@ window.addEventListener('DOMContentLoaded', async () => {
     const roomsPerSide = 16; 
     document.documentElement.style.setProperty('--rooms-per-side', `${roomsPerSide}`); 
 
-
     // INSTANTIATE PALACE
 
     let palace = new Palace(); 
+    const storagePalace = JSON.parse(localStorage.getItem('palace')); 
+    if(storagePalace) {
+        palace.load(storagePalace); 
+    }
     await palace.Build(); 
-    console.log(palace); 
     palace.Save(); 
+
+
+    // ASSERTIONS
+
+    const assertionGainFocus = input => {
+        input.target.innerText = ''; 
+    }; 
+
+    const assertionSubmit = sub => {
+        const mem = palace.Memories.find(mem => mem.id === +sub.target.parentElement.getAttribute('id')); 
+        mem.assertion = sub.target.innerText; 
+        l(mem); 
+        palace.Save(); 
+    }; 
+
+    const assertionKeydown = keydown => {
+        if(keydown.key === 'Return' || keydown.key === 'Enter') {
+            document.activeElement.blur(); 
+        }
+    }; 
 
 
     // MAKE DOM MEMORIES
 
-    const AddMemory = async memoryId => {
-        const palaceMemory = palace.Memories.find(mem => mem.id === memoryId); 
+    const AddMemory = async palaceMemory => {
         if(!palaceMemory) {
             return; 
         }
         
         const template = document.querySelector('template[type="memory"]'); 
-        const memory = template.content; 
-        memory.querySelector('.assertion').innerText = palaceMemory.assertion; 
+        const memory = template.content.cloneNode(true); 
+        memory.querySelector('.assertion').innerText = palaceMemory.assertion ? `${palaceMemory.assertion}` : `${palaceMemory.id} : ${palaceMemory.fileName}`; 
         document.querySelector('.memories').prepend(memory); 
+        
+        // INIT LISTENERS
+        
+        // FRAGMENTS GET DELETED BEFORE CALLBACK FIRES, SO GET REF TO FULL ELEMENT
+        const memoryRef = document.querySelector('.memories').firstElementChild; 
 
+        memoryRef.setAttribute('id', `${palaceMemory.id}`); 
+
+        const ass = memoryRef.querySelector('.assertion'); 
+        ass.addEventListener('focus', assertionGainFocus); 
+        ass.addEventListener('focusout', assertionSubmit); 
+        ass.addEventListener('keydown', assertionKeydown); 
+        
         // const imgFile = palaceMemory.handle; 
         const imgFile = await palace.Storage.MemoryImages.getFileHandle(`${palaceMemory.id}.${palaceMemory.extension}`);
         const memoryImg = await imgFile.getFile();
         const rdr = new FileReader(); 
-
+        
         rdr.addEventListener('load', load => {
             const res = rdr.result; 
-            document.querySelector('.memory').style.backgroundImage = `URL("${res}")`; 
+            memoryRef.querySelector('.memory-img').style.backgroundImage = `URL("${res}")`; 
         }); 
         rdr.readAsDataURL(memoryImg); 
     }
     
-    for(let i = 0; i < palace.MemoryCount; ++i) {
-        AddMemory(i); 
+    for(let i = 0; i < palace.Memories.length; ++i) {
+        AddMemory(palace.Memories[i]); 
     }
 
 
@@ -68,12 +101,29 @@ window.addEventListener('DOMContentLoaded', async () => {
             const act = room.getAttribute('active') !== 'true'; 
             room.setAttribute('active', act); 
             palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].active = act; 
-            palace.Save(); 
         }
     }
     document.querySelector('.floor-plan').addEventListener('mousedown', roomActivation); 
     document.querySelector('.floor-plan').addEventListener('mouseover', roomActivation); 
 
+    document.querySelector('.floor-plan').addEventListener('mouseup', () => palace.Save()); 
+
+
+    // CLEAR THE MAP
+
+    document.querySelector('.clear').addEventListener('click', click => {
+        palace = new Palace(); 
+        palace.Build(); 
+        palace.Save(); 
+
+        document.querySelectorAll('[active="true"]').forEach(room => {
+            room.setAttribute('active', 'false'); 
+        }); 
+
+        document.querySelectorAll('div.memory').forEach(mem => {
+            mem.remove(); 
+        }); 
+    })
     
     // SAVE FILE INPUT
 
@@ -86,7 +136,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
         
         if(id !== -1) {
-            AddMemory(id); 
+            AddMemory(palace.Memories.find(mem => mem.id === id)); 
 
             // TESTING
             palace.Rooms[0][0].memories.north = id; 
@@ -96,3 +146,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     }); 
 
 }); 
+
+const l = console.log; 
