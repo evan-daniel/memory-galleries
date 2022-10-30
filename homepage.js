@@ -36,6 +36,20 @@ window.addEventListener('DOMContentLoaded', async () => {
     }; 
 
 
+    // CONVENIENCE
+    // ADD BACKGROUND IMAGES
+
+    const addBgImg = async (handle, elem) => {
+        const rdr = new FileReader(); 
+        rdr.addEventListener('load', () => {
+            const res = rdr.result; 
+            elem.style.backgroundImage = `URL("${res}")`; 
+        }); 
+        const img = await handle.getFile();
+        rdr.readAsDataURL(img); 
+    }; 
+
+
     // MAKE DOM MEMORIES
 
     const AddMemory = async palaceMemory => {
@@ -90,7 +104,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
 
-    // MAKE DOM ELEMENTS
+    // MAKE DOM FLOOR PLAN
     
     const roomsDom = document.createDocumentFragment('div'); 
     for(let y = 0; y < roomsPerSide; ++y) {
@@ -100,7 +114,17 @@ window.addEventListener('DOMContentLoaded', async () => {
             room.setAttribute('column', x); 
             room.setAttribute('row', y);
             room.setAttribute('active', palace.Rooms[y][x].active);  
+            room.setAttribute('has-memory', 'false'); 
             roomsDom.appendChild(room); 
+
+            const mem_id = palace.Rooms[y][x].memory; 
+            if(mem_id !== -1) {
+                const mem = palace.Memories.find(mem => mem.id === mem_id); 
+                if(mem) {
+                    addBgImg(mem.handle, room); 
+                    room.setAttribute('has-memory', 'true'); 
+                }
+            }
         }
     }
     document.querySelector('.floor-plan').append(roomsDom); 
@@ -127,7 +151,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.floor-plan').addEventListener('mouseup', () => palace.Save()); 
 
 
-    // MEMORY INTO ROOMS
+    // PUT MEMORY INTO ROOMS
 
     const removeDrags = () => {
         document.querySelectorAll(['[dragover = "true"]']).forEach(d => d.setAttribute('dragover', 'false')); 
@@ -141,8 +165,20 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     document.querySelector('.floor-plan').addEventListener('drop', drop => {
         l(drop); 
+        
+        const room = drop.target; 
         const id = +drop.dataTransfer.getData('text'); 
+        if(
+            !room.classList.contains('room')
+            || typeof id !== 'number'
+        ) {
+            return; 
+        }
 
+        palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].memory = id; 
+        palace.Save(); 
+        addBgImg(palace.Memories.find(mem => mem.id === id).handle, room); 
+        room.setAttribute('has-memory', 'true'); 
         
     }, false); 
     
@@ -163,6 +199,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('div.memory').forEach(mem => {
             mem.remove(); 
         }); 
+
+        document.querySelectorAll('.room[has-memory = "true"]').forEach(room => {
+            room.style.backgroundImage = ''; 
+            room.setAttribute('has-memory', 'false'); 
+        }); 
     })
     
     // SAVE FILE INPUT
@@ -177,11 +218,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         
         if(id !== -1) {
             AddMemory(palace.Memories.find(mem => mem.id === id)); 
-
-            // TESTING
-            palace.Rooms[0][0].memories.north = id; 
-
             palace.Save(); 
+
+            
         }
     }); 
 
