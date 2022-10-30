@@ -8,10 +8,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     let palace = new Palace(); 
     const storagePalace = JSON.parse(localStorage.getItem('palace')); 
-    if(storagePalace) {
-        palace.load(storagePalace); 
-    }
     await palace.Build(); 
+    if(storagePalace) {
+        await palace.load(storagePalace); 
+        console.log(palace); 
+    }
     palace.Save(); 
 
 
@@ -39,28 +40,41 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const AddMemory = async palaceMemory => {
         if(!palaceMemory) {
+            console.log('ADDING MEMORY DOM ABORTED'); 
             return; 
         }
+        
+        // GET TEMPLATE
+        // SET THINGS THAT WEREN'T IN THE TEMPLATE
         
         const template = document.querySelector('template[type="memory"]'); 
         const memory = template.content.cloneNode(true); 
         memory.querySelector('.assertion').innerText = palaceMemory.assertion ? `${palaceMemory.assertion}` : `${palaceMemory.id} : ${palaceMemory.fileName}`; 
+        const memoryRef = memory.querySelector('.memory')
+        memoryRef.setAttribute('draggable', true); 
+        memoryRef.setAttribute('id', `${palaceMemory.id}`); 
         document.querySelector('.memories').prepend(memory); 
         
-        // INIT LISTENERS
+        // DATA TRANSFER
+
+        memoryRef.addEventListener('dragstart', dragstart => {
+            memoryRef.setAttribute('being-dragged', 'true'); 
+            dragstart.dataTransfer.setData('text', `${palaceMemory.id}`); 
+        }); 
+
+        memoryRef.addEventListener('dragend', dragend => {
+            memoryRef.setAttribute('being-dragged', 'false'); 
+        }); 
         
-        // FRAGMENTS GET DELETED BEFORE CALLBACK FIRES, SO GET REF TO FULL ELEMENT
-        const memoryRef = document.querySelector('.memories').firstElementChild; 
-
-        memoryRef.setAttribute('id', `${palaceMemory.id}`); 
-
+        // ASSERTION
+        
         const ass = memoryRef.querySelector('.assertion'); 
         ass.addEventListener('focus', assertionGainFocus); 
         ass.addEventListener('focusout', assertionSubmit); 
         ass.addEventListener('keydown', assertionKeydown); 
         
-        // const imgFile = palaceMemory.handle; 
-        const imgFile = await palace.Storage.MemoryImages.getFileHandle(`${palaceMemory.id}.${palaceMemory.extension}`);
+        const imgFile = palaceMemory.handle; 
+        // const imgFile = await palace.Storage.MemoryImages.getFileHandle(`${palaceMemory.id}.${palaceMemory.extension}`);
         const memoryImg = await imgFile.getFile();
         const rdr = new FileReader(); 
         
@@ -104,9 +118,35 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }
     document.querySelector('.floor-plan').addEventListener('mousedown', roomActivation); 
-    document.querySelector('.floor-plan').addEventListener('mouseover', roomActivation); 
+    document.querySelector('.floor-plan').addEventListener('mouseover', mouseover => {
+        if(mouseover.fromElement?.classList.contains('room')) {
+            roomActivation(mouseover); 
+        }
+    }); 
 
     document.querySelector('.floor-plan').addEventListener('mouseup', () => palace.Save()); 
+
+
+    // MEMORY INTO ROOMS
+
+    const removeDrags = () => {
+        document.querySelectorAll(['[dragover = "true"]']).forEach(d => d.setAttribute('dragover', 'false')); 
+    }; 
+    
+    document.querySelector('.floor-plan').addEventListener('dragover', dragover => {
+        dragover.preventDefault(); 
+        removeDrags(); 
+        dragover.target.setAttribute('dragover', true); 
+    }); 
+
+    document.querySelector('.floor-plan').addEventListener('drop', drop => {
+        l(drop); 
+        const id = +drop.dataTransfer.getData('text'); 
+
+        
+    }, false); 
+    
+    document.addEventListener('dragend', removeDrags); 
 
 
     // CLEAR THE MAP

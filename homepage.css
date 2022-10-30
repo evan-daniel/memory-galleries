@@ -78,6 +78,10 @@ a {
 .room[active = 'true'] {
     background-color: #ccf; 
 }
+.room[dragover = "true"] {
+    background-color: #f0f;
+}
+
 
 /* LOCI */
 
@@ -141,6 +145,9 @@ a {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+.memory[being-dragged = "true"] {
+    opacity: 0.66; 
 }
 
 .memory-img {

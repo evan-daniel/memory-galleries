@@ -7,9 +7,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // VARIABLES
     
-    const _palace = new Palace(); 
-    _palace.Build(); 
-    const palace = JSON.parse(localStorage.getItem('palace')); 
+    const palace = new Palace(); 
+    const storagePalace = JSON.parse(localStorage.getItem('palace')); 
+    if(storagePalace) {
+        palace.load(storagePalace); 
+    }
+    await palace.Build(); 
+    
     const rooms = palace.Rooms; 
     const WallWidth = 10; 
     const WallHeight = 10; 
@@ -162,9 +166,9 @@ window.addEventListener('DOMContentLoaded', async () => {
                 if(!Locis[ClosestIndex].answered) {
                     Locis[ClosestIndex].answered = true; 
     
-                    // FROM STORAGE
+                    // FROM OPFS
                     
-                    const imgFile = await _palace.Storage.MemoryImages.getFileHandle(`0.png`);
+                    const imgFile = await palace.Storage.MemoryImages.getFileHandle(`0.png`);
                     const memoryImg = await imgFile.getFile();
                     const rdr = new FileReader(); 
                     rdr.addEventListener('load', load => {
