@@ -48,16 +48,16 @@ body {
     background-color: #0F0; 
 }
 
-/* SPLAIN */
+/* ANSWER */
 
-.splain-container {
+.ans-container {
     position: fixed; 
     bottom: 1rem; 
     left: 1rem; 
     width: 25rem; 
 }
 
-.splain {
+.ans {
     height: 5rem; 
     margin: 1rem; 
     padding: 1rem;

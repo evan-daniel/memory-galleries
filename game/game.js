@@ -9,10 +9,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     const palace = new Palace(); 
     const storagePalace = JSON.parse(localStorage.getItem('palace')); 
+    await palace.Build(); 
     if(storagePalace) {
         palace.load(storagePalace); 
     }
-    await palace.Build(); 
     
     const rooms = palace.Rooms; 
     const WallWidth = 10; 
@@ -27,43 +27,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight); 
     renderer.setPixelRatio(window.devicePixelRatio); 
     renderer.shadowMap.enabled = true; 
-    const camera = new THREE.PerspectiveCamera(75, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 1000); 
     const scene = new THREE.Scene(); 
+
     scene.background = new THREE.Color(0x88CCFF); 
     scene.fog = new THREE.FogExp2(0X4488CC, 0.01); 
+    const camera = new THREE.PerspectiveCamera(75, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 1000); 
+    camera.position.set(2, 1, -0.5); 
+    // camera.rotation._order = 'XZY'; 
+    camera.rotation.order = 'YXZ'; 
+    scene.add(camera); 
 
     // LIGHT
-    // const dir_light = new THREE.DirectionalLight(0xFFFFFF, 1); 
-    // dir_light.castShadow = true; 
-    // dir_light.position.set(3, 14, 5); 
-    // scene.add(dir_light); 
     const hemi_light = new THREE.HemisphereLight(0xFFFFFF, 1); 
     scene.add(hemi_light); 
-
-    // LOAD SCENE
-    const loader = new GLTFLoader(); 
-    let player; 
-    loader.load('../assets/model/tutorial-scene.glb', gltf => {
-        player = gltf.scene.getObjectByName('player_ephemeral'); 
-        player.position.z = player.position.x = 2; 
-        scene.add(player); 
-        scene.traverse(node => {
-            if(node instanceof THREE.Mesh) {
-                node.castShadow = true; 
-                node.receiveShadow = true; 
-                
-            }
-        }); 
-        player.traverse(node => {
-            if(node instanceof THREE.Mesh) {
-                node.castShadow = false; 
-                node.receiveShadow = false; 
-            }
-        }); 
-        player.add(camera); 
-        camera.position.set(0, 1, -0.5); 
-        window.requestAnimationFrame(animate); 
-    }, null, null); 
 
     // GROUND
 
@@ -72,6 +48,33 @@ window.addEventListener('DOMContentLoaded', async () => {
     ground.position.set(WallWidth * 8, 0, WallWidth * 8); 
     ground.rotation.x = - Math.PI / 2; 
     scene.add(ground); 
+
+    // LOAD SCENE
+    // const loader = new GLTFLoader(); 
+    // let player; 
+    // loader.load('../assets/model/tutorial-scene.glb', gltf => {
+    //     player = gltf.scene.getObjectByName('player_ephemeral'); 
+    //     player.position.z = player.position.x = 2; 
+    //     scene.add(player); 
+    //     scene.traverse(node => {
+    //         if(node instanceof THREE.Mesh) {
+    //             node.castShadow = true; 
+    //             node.receiveShadow = true; 
+                
+    //         }
+    //     }); 
+    //     player.traverse(node => {
+    //         if(node instanceof THREE.Mesh) {
+    //             node.castShadow = false; 
+    //             node.receiveShadow = false; 
+    //         }
+    //     }); 
+    //     player.add(camera); 
+    //     camera.position.set(0, 1, -0.5); 
+    //     window.requestAnimationFrame(animate); 
+    // }, null, null); 
+
+
 
     // ROOMS
 
@@ -150,18 +153,17 @@ window.addEventListener('DOMContentLoaded', async () => {
             console.log('ENTER'); 
             let ClosestIndex = -1; 
             Locis.forEach((loci, index) => {
-                const GetDistance = (x, z) => (x - player.position.x) ** 2 + (z - player.position.z) ** 2; 
+                const GetDistance = (x, z) => (x - camera.position.x) ** 2 + (z - camera.position.z) ** 2; 
                 if(ClosestIndex === -1) {
                     ClosestIndex = index; 
                 } else {
                     if(GetDistance(loci.x, loci.z) < GetDistance(Locis[ClosestIndex].x, Locis[ClosestIndex].z)) {
                         ClosestIndex = index; 
                     }
-                    
                 }
             }); 
             
-            const submission = document.querySelector('.splain').innerText; 
+            const submission = document.querySelector('.ans').innerText; 
             if(submission === Locis[ClosestIndex].answer) {
                 if(!Locis[ClosestIndex].answered) {
                     Locis[ClosestIndex].answered = true; 
@@ -202,7 +204,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         ' ': false, 
     }; 
     document.addEventListener('keydown', keydown => {
-        if(document.activeElement.classList.contains('splain')) {
+        if(document.activeElement.classList.contains('ans')) {
             return; 
         }
         
@@ -223,8 +225,37 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderer.domElement.addEventListener('mousemove', mousemove => {
         if(document.pointerLockElement === renderer.domElement) {
             const ROT_SPEED = 1 / 256; 
-            player.rotation.y -= mousemove.movementX * ROT_SPEED; 
-            camera.rotation.x -= mousemove.movementY * ROT_SPEED; 
+            camera.rotation.y -= mousemove.movementX * ROT_SPEED; 
+            // camera.rotation.x -= mousemove.movementY * ROT_SPEED; 
+            
+            const rotScalar = mousemove.movementY * ROT_SPEED; 
+            let rx = -1 * rotScalar; 
+            let rz = Math.sin(camera.rotation.y) * rotScalar; 
+
+            camera.rotation.x += rx; 
+
+            // camera.rotation.x -= rx; 
+            // camera.rotation.z += rz; 
+            // camera.rotateZ(rz); 
+
+            // camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), -1 * rotScalar); 
+            // camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), -1 * mousemove.movementX * ROT_SPEED)
+
+
+            // let quaternion = new THREE.Quaternion()
+            // quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0).normalize(), 0.005);
+            // .setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.05);
+            // camera.position.applyQuaternion(quaternion)
+
+            // camera.rotation.applyEuler(new THREE.Euler(0.01, 0, 0, 'XZY'))
+
+
+            // camera.rotation.x = rx; 
+            // camera.rotation.y = ry; 
+            // camera.rotation.z = rz; 
+
+            // camera.rotation.z -= Math.sin(camera.rotation.y) * rotScalar; 
+
         }
     }); 
 
@@ -239,12 +270,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         const movement = new THREE.Vector3(input.d - input.a, 0, input.s - input.w); 
         movement.normalize(); 
         movement.multiplyScalar(SPEED); 
-        movement.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y); 
-        player.position.add(movement); 
+        movement.applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y); 
+        camera.position.add(movement); 
 
         // COLLISION DETECTION
         const v = new THREE.Vector3(1, 0, 0); 
-        v.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y); 
+        v.applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y); 
         for(let i = 0; i < 8; i++) {
             v.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 4); 
             const origin = new THREE.Vector3(); 
@@ -253,7 +284,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             const collisions = raycaster.intersectObjects(scene.children, true); 
             collisions.forEach(obstacle => {
                 if(obstacle.object.name.indexOf('ephemeral') === -1) {
-                    player.position.sub(movement); 
+                    camera.position.sub(movement); 
                     i = 8; 
                     return true; 
                 }
@@ -261,14 +292,14 @@ window.addEventListener('DOMContentLoaded', async () => {
         } 
 
         // JUMPING
-        const platform_detector = new THREE.Raycaster(player.position, new THREE.Vector3(0, -1, 0)); 
+        const platform_detector = new THREE.Raycaster(camera.position, new THREE.Vector3(0, -1, 0)); 
         const platform_below = platform_detector.intersectObjects(scene.children, true); 
         const GRAVITY = 0.01, JUMP_STRENGTH = 0.3, HOVER = 0.01; 
         // vy -= GRAVITY; 
         platform_below.forEach(platform => {
             if(platform.object.name.indexOf('platform') !== -1 && platform.distance <= -vy + 2 * HOVER) {
                 vy = 0; 
-                player.position.y = platform.point.y + HOVER; 
+                camera.position.y = platform.point.y + HOVER; 
                 if(input[' ']) {
                     input[' '] = false; 
                     vy = JUMP_STRENGTH; 
@@ -276,12 +307,12 @@ window.addEventListener('DOMContentLoaded', async () => {
                 return; 
             }
         }); 
-        player.position.y += vy; 
+        camera.position.y += vy; 
 
         // RENDER
         window.requestAnimationFrame(animate); 
         renderer.render(scene, camera); 
         ++framecount; 
     }; 
-            
+    window.requestAnimationFrame(animate); 
 }); 
