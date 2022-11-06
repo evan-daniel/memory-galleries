@@ -239,7 +239,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ desc: 'large bird' }),
+          body: JSON.stringify({ desc: 'dinosaur bird' }),
         });
         const data = await response.json();
         document.querySelector('.ai-img-url').innerText = data.result;
