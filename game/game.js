@@ -1,5 +1,4 @@
 import * as THREE from '../lib/three.module.js'; 
-import { GLTFLoader } from '../lib/GLTFLoader.js'; 
 
 import Palace from '../lib/Palace.js'; 
 
@@ -16,10 +15,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     const rooms = palace.Rooms; 
     const WallWidth = 10; 
-    const WallHeight = 10; 
+    const WallHeight = 5; 
+
+    let targetedLocus = {
+        mesh: null, 
+        mem: null, 
+    }; 
+
+    const elAns = document.querySelector('.ans'); 
+    
     console.log('PALACE', palace); 
     
     // INIT
+    
     const renderer = new THREE.WebGLRenderer({ 
         canvas: document.querySelector('canvas'), 
         antialias: true, 
@@ -27,17 +35,21 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight); 
     renderer.setPixelRatio(window.devicePixelRatio); 
     renderer.shadowMap.enabled = true; 
-    const scene = new THREE.Scene(); 
 
+    const scene = new THREE.Scene(); 
     scene.background = new THREE.Color(0x88CCFF); 
     scene.fog = new THREE.FogExp2(0X4488CC, 0.01); 
+
     const camera = new THREE.PerspectiveCamera(75, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 1000); 
-    camera.position.set(2, 1, -0.5); 
-    // camera.rotation._order = 'XZY'; 
+    camera.position.set(0, 2, WallWidth / 2); 
     camera.rotation.order = 'YXZ'; 
+    camera.rotation.y += 3 * Math.PI / 2; 
     scene.add(camera); 
 
+    const texLoader = new THREE.TextureLoader(); 
+
     // LIGHT
+
     const hemi_light = new THREE.HemisphereLight(0xFFFFFF, 1); 
     scene.add(hemi_light); 
 
@@ -45,44 +57,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(WallWidth * 16, WallWidth * 16), new THREE.MeshBasicMaterial( { color: 0x00ff00 } )); 
     ground.material.side = THREE.DoubleSide; 
-    ground.position.set(WallWidth * 8, 0, WallWidth * 8); 
+    ground.position.set(WallWidth * 8 - WallWidth / 2, 0, WallWidth * 8 - WallWidth / 2); 
     ground.rotation.x = - Math.PI / 2; 
     scene.add(ground); 
 
-    // LOAD SCENE
-    // const loader = new GLTFLoader(); 
-    // let player; 
-    // loader.load('../assets/model/tutorial-scene.glb', gltf => {
-    //     player = gltf.scene.getObjectByName('player_ephemeral'); 
-    //     player.position.z = player.position.x = 2; 
-    //     scene.add(player); 
-    //     scene.traverse(node => {
-    //         if(node instanceof THREE.Mesh) {
-    //             node.castShadow = true; 
-    //             node.receiveShadow = true; 
-                
-    //         }
-    //     }); 
-    //     player.traverse(node => {
-    //         if(node instanceof THREE.Mesh) {
-    //             node.castShadow = false; 
-    //             node.receiveShadow = false; 
-    //         }
-    //     }); 
-    //     player.add(camera); 
-    //     camera.position.set(0, 1, -0.5); 
-    //     window.requestAnimationFrame(animate); 
-    // }, null, null); 
-
-
-
     // ROOMS
 
-    const WallMaterial = new THREE.MeshBasicMaterial( { color: 0xaa88aa } ); 
+    const WallMaterial = new THREE.MeshBasicMaterial( { color: 0xccccee } ); 
     WallMaterial.side = THREE.DoubleSide; 
-    const BlueWallMaterial = new THREE.MeshBasicMaterial( { color: 0xCCCCFF }); 
-    BlueWallMaterial.side = THREE.DoubleSide; 
     const WallTemplate = new THREE.Mesh(new THREE.PlaneGeometry(WallWidth * 0.99, WallHeight * 0.99), WallMaterial); 
+
     for(let y = 0; y < rooms.length; ++y) {
         for(let x = 0; x < rooms[0].length; ++x) {
 
@@ -99,102 +83,73 @@ window.addEventListener('DOMContentLoaded', async () => {
             
             if(y === 0 || !rooms[y - 1][x].active || !rooms[y][x].active ) {
                 const Wall = WallTemplate.clone(); 
-                if(y === 0 && x === 1) {
-                    Wall.material = BlueWallMaterial; 
-                }
                 Wall.position.set(x * WallWidth, WallHeight / 2, y * WallWidth); 
                 scene.add(Wall); 
 
             }
+
+            // LOCI
+            
+            const MemoryId = palace.Rooms[y][x].memory; 
+            if(MemoryId !== -1) {
+                const TestMat = new THREE.MeshBasicMaterial( { color: 0x0000ff }); 
+                const loci_mesh = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), TestMat); 
+                loci_mesh.material.side = THREE.DoubleSide; 
+                loci_mesh.position.set(x * WallWidth, 2.5, y * WallWidth + WallWidth / 2); 
+                loci_mesh.rotation.y -= Math.PI / 4; 
+                loci_mesh.name = 'locus'; 
+                loci_mesh.custom = {
+                    id: MemoryId, 
+                }; 
+                scene.add(loci_mesh); 
+            }
         }
     }
 
-    // LOAD SAMPLE IMAGE AS PLANE
-    const MakeImage = (x, z) => {
-        const TestMat = new THREE.MeshBasicMaterial( { color: 0x0000ff }); 
-        const SampleImage_Plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), TestMat); 
-        SampleImage_Plane.material.side = THREE.DoubleSide; 
-        SampleImage_Plane.position.set(x, 2.5, z); 
-        scene.add(SampleImage_Plane); 
-        return SampleImage_Plane; 
+    // LOAD IMG TO WALL
+
+    const LoadImgToMesh = async (fileHandle, mesh) => {
+        if(!fileHandle || !mesh) {
+            return; 
+        }
+
+        const memoryImg = await fileHandle.getFile();
+        const rdr = new FileReader(); 
+        rdr.addEventListener('load', load => {
+            const res = rdr.result; 
+
+            // SET UP NEW MATERIAL
+            
+            const SampleImage_Texture = texLoader.load(res); 
+            SampleImage_Texture.wrapS = THREE.RepeatWrapping; 
+            SampleImage_Texture.wrapT = THREE.RepeatWrapping; 
+            SampleImage_Texture.repeat.set( 1, 1 ); 
+
+            const SampleImage_Material = new THREE.MeshLambertMaterial( { map: SampleImage_Texture } ); 
+            SampleImage_Material.side = THREE.DoubleSide; 
+            
+            mesh.material = SampleImage_Material; 
+        }); 
+        rdr.readAsDataURL(memoryImg); 
+
     }; 
-    
-    const Locis = [
-        { 
-            url: '', 
-            x: 20, 
-            z: 5, 
-            answer: 'parker prall stace greene', 
-        }, { 
-            url: '../assets/loci/0001_santayana_ducasse_cassirer_langer.png', 
-            x: 15, 
-            z: -5, 
-            answer: 'santayana ducasse cassirer langer', 
-        }, { 
-            url: '../assets/loci/0002.png', 
-            x: 15, 
-            z: -25, 
-            answer: 'dilman gotshalk arnold isenberg', 
-        }, { 
-            url: '../assets/loci/0003.png', 
-            x: 25, 
-            z: -25, 
-            answer: 'monroe beardsley nelson goodman', 
-        }
-    ]; 
-    
-    Locis.forEach(loci => {
-        loci.object = MakeImage(loci.x, loci.z); 
-        loci.answered = false; 
-    }); 
 
-    document.addEventListener('keydown', async DocumentKeydown => {
-        if(DocumentKeydown.key === 'Enter') {
-            console.log('ENTER'); 
-            let ClosestIndex = -1; 
-            Locis.forEach((loci, index) => {
-                const GetDistance = (x, z) => (x - camera.position.x) ** 2 + (z - camera.position.z) ** 2; 
-                if(ClosestIndex === -1) {
-                    ClosestIndex = index; 
-                } else {
-                    if(GetDistance(loci.x, loci.z) < GetDistance(Locis[ClosestIndex].x, Locis[ClosestIndex].z)) {
-                        ClosestIndex = index; 
-                    }
-                }
-            }); 
+    // USER WRITES MEMORY CONTENT
+    
+    elAns.addEventListener('keydown', async keydown => {
+        console.log(keydown); 
+        
+        if(keydown.key === 'Enter') {
+            document.activeElement.blur(); 
             
-            const submission = document.querySelector('.ans').innerText; 
-            if(submission === Locis[ClosestIndex].answer) {
-                if(!Locis[ClosestIndex].answered) {
-                    Locis[ClosestIndex].answered = true; 
-    
-                    // FROM OPFS
-                    
-                    const imgFile = await palace.Storage.MemoryImages.getFileHandle(`0.png`);
-                    const memoryImg = await imgFile.getFile();
-                    const rdr = new FileReader(); 
-                    rdr.addEventListener('load', load => {
-                        const res = rdr.result; 
-
-                        const SampleImage_Texture = THREE.ImageUtils.loadTexture(res); 
-                        SampleImage_Texture.wrapS = THREE.RepeatWrapping; 
-                        SampleImage_Texture.wrapT = THREE.RepeatWrapping; 
-                        SampleImage_Texture.repeat.set( 1, 1 ); 
-                        const SampleImage_Material = new THREE.MeshLambertMaterial( { map: SampleImage_Texture } ); 
-                        SampleImage_Material.side = THREE.DoubleSide; 
-                        Locis[ClosestIndex].object.material = SampleImage_Material; 
-                    }); 
-                    rdr.readAsDataURL(memoryImg); 
-                }
-
-                console.log('CO RECT'); 
+            if(elAns.innerText === targetedLocus.mem.assertion) {
+                LoadImgToMesh(targetedLocus.mem.handle, targetedLocus.mesh); 
             }
-            
         }
     }); 
-
 
     // KEYBOARD
+
     const input = {
         w: false, 
         a: false, 
@@ -218,62 +173,66 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }); 
 
-    // POINTER
+    // CLICK 
+
     renderer.domElement.addEventListener('click', focus => {
-        renderer.domElement.requestPointerLock(); 
+
+        // LOCK POINTER, RETURN
+        
+        if(document.pointerLockElement !== renderer.domElement) {
+            renderer.domElement.requestPointerLock(); 
+            return; 
+        }
+
+        // RAYCAST FOR LOCUS
+
+        let v = new THREE.Vector3(1, 0, 0); 
+        v.applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y); 
+        v = new THREE.Vector3(camera.rotation.x, camera.rotation.y, camera.rotation.z); 
+
+        const rayO = new THREE.Vector3(); 
+        camera.getWorldPosition(rayO); 
+
+        const raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3, 0, 25);
+        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);   
+        const collisions = raycaster.intersectObjects(scene.children, true); 
+        for(let obstacle of collisions) {
+            if(obstacle.object.name === 'locus') {
+                const locusId = obstacle.object.custom.id; 
+                const mem = palace.Memories.find(mem => mem.id === locusId); 
+
+                // LOAD IMAGE TO MESH IMMEDIATELY
+                
+                LoadImgToMesh(mem.handle, obstacle.object); 
+
+                // targetedLocus.mem = mem; 
+                // targetedLocus.mesh = obstacle.object; 
+                // elAns.focus(); 
+            }
+        }; 
     }); 
+
     renderer.domElement.addEventListener('mousemove', mousemove => {
         if(document.pointerLockElement === renderer.domElement) {
             const ROT_SPEED = 1 / 256; 
             camera.rotation.y -= mousemove.movementX * ROT_SPEED; 
-            // camera.rotation.x -= mousemove.movementY * ROT_SPEED; 
-            
-            const rotScalar = mousemove.movementY * ROT_SPEED; 
-            let rx = -1 * rotScalar; 
-            let rz = Math.sin(camera.rotation.y) * rotScalar; 
-
-            camera.rotation.x += rx; 
-
-            // camera.rotation.x -= rx; 
-            // camera.rotation.z += rz; 
-            // camera.rotateZ(rz); 
-
-            // camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), -1 * rotScalar); 
-            // camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), -1 * mousemove.movementX * ROT_SPEED)
-
-
-            // let quaternion = new THREE.Quaternion()
-            // quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0).normalize(), 0.005);
-            // .setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.05);
-            // camera.position.applyQuaternion(quaternion)
-
-            // camera.rotation.applyEuler(new THREE.Euler(0.01, 0, 0, 'XZY'))
-
-
-            // camera.rotation.x = rx; 
-            // camera.rotation.y = ry; 
-            // camera.rotation.z = rz; 
-
-            // camera.rotation.z -= Math.sin(camera.rotation.y) * rotScalar; 
-
+            camera.rotation.x -= mousemove.movementY * ROT_SPEED; 
         }
     }); 
 
+    // APPLY MOVEMENT
 
-    // ANIMATE
-    let vy = 0; 
-    let framecount = 0; 
-    const animate = timestamp => {
+    const ApplyMovement = () => {
 
-        // MOVEMENT
         const SPEED = 1 / 4; 
         const movement = new THREE.Vector3(input.d - input.a, 0, input.s - input.w); 
         movement.normalize(); 
         movement.multiplyScalar(SPEED); 
         movement.applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y); 
         camera.position.add(movement); 
-
+    
         // COLLISION DETECTION
+
         const v = new THREE.Vector3(1, 0, 0); 
         v.applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y); 
         for(let i = 0; i < 8; i++) {
@@ -290,29 +249,20 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }
             }); 
         } 
+    }; 
 
-        // JUMPING
-        const platform_detector = new THREE.Raycaster(camera.position, new THREE.Vector3(0, -1, 0)); 
-        const platform_below = platform_detector.intersectObjects(scene.children, true); 
-        const GRAVITY = 0.01, JUMP_STRENGTH = 0.3, HOVER = 0.01; 
-        // vy -= GRAVITY; 
-        platform_below.forEach(platform => {
-            if(platform.object.name.indexOf('platform') !== -1 && platform.distance <= -vy + 2 * HOVER) {
-                vy = 0; 
-                camera.position.y = platform.point.y + HOVER; 
-                if(input[' ']) {
-                    input[' '] = false; 
-                    vy = JUMP_STRENGTH; 
-                } 
-                return; 
-            }
-        }); 
-        camera.position.y += vy; 
+    // ANIMATE
+
+    const animate = timestamp => {
+
+        if(document.pointerLockElement === renderer.domElement) {
+            ApplyMovement(); 
+        }
 
         // RENDER
+
         window.requestAnimationFrame(animate); 
         renderer.render(scene, camera); 
-        ++framecount; 
     }; 
     window.requestAnimationFrame(animate); 
 }); 

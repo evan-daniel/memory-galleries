@@ -227,3 +227,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 }); 
 
 const l = console.log; 
+
+/* 
+
+SAMPLE ANSWERS
+
+'parker prall stace greene', 
+'santayana ducasse cassirer langer', 
+'dilman gotshalk arnold isenberg', 
+'monroe beardsley nelson goodman', 
+
+*/ 
