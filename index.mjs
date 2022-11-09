@@ -30,6 +30,7 @@ app.post('/api/generate', async (req, res) => {
     
 }); 
 
-app.use(express.static('public')); 
+// app.use(express.static('public')); 
+// app.listen(3000, () => console.log('Listening on port 3000.'));
 
-app.listen(3000, () => console.log('Listening on port 3000.'));
+export default app; 
