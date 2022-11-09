@@ -11,11 +11,11 @@ export default {
     game: './src/js/game.js', 
   }, 
   devServer: {
-    static: './dist',
+    static: './public',
   },
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'public'),
     clean: true, 
   },
   module: {
