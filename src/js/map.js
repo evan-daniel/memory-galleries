@@ -1,4 +1,7 @@
-import Palace from './lib/Palace.js'; 
+import '../css/global.css'; 
+import '../css/map.css'; 
+
+import Palace from './Palace.js'; 
 
 window.addEventListener('DOMContentLoaded', async () => {
     const roomsPerSide = 16; 

@@ -1,0 +1,15 @@
+:root {
+    box-sizing: border-box; 
+}
+
+*, 
+::before, 
+::after {
+    box-sizing: inherit; 
+    margin: 0; 
+}
+
+a {
+    text-decoration: none;
+    color: #00f; 
+}

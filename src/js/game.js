@@ -1,6 +1,9 @@
-import * as THREE from '../lib/three.module.js'; 
+import '../css/global.css'; 
+import '../css/game.css'; 
 
-import Palace from '../lib/Palace.js'; 
+import * as THREE from 'three'; 
+
+import Palace from './Palace.js'; 
 
 window.addEventListener('DOMContentLoaded', async () => {
 

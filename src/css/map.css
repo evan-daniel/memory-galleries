@@ -1,24 +1,4 @@
-/* GLOBAL */
-
-:root {
-    box-sizing: border-box;
-
-    --rooms-per-side: 1; 
-}
-
-*, 
-::before, 
-::after {
-    box-sizing: inherit; 
-    margin: 0; 
-    padding: 0; 
-
-    background-size: cover; 
-    background-repeat: no-repeat;
-    background-position: center; 
-    
-    outline: 0; 
-}
+/* FULL-PAGE BODY */
 
 body {
     position: fixed; 
@@ -28,11 +8,6 @@ body {
     left: 0; 
     
     font-family: 'Futura', sans-serif; 
-}
-
-a {
-    text-decoration: none;
-    color: #00f; 
 }
 
 /* SCHEMATIC CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
