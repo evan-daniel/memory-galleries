@@ -233,20 +233,41 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }); 
 
-    document.querySelector('.tst-ai-img').addEventListener('click', async () => {
+    document.querySelector('.ai-img-url').addEventListener('click', async () => {
 
-        console.log('POSTING…')
+        const query = document.querySelector('.ai-img-query').value; 
+        console.log('POSTING…', query); 
+        if(query === '') {
+            return; 
+        }
         
-        const response = await fetch("/api/generate", {
+        const response = await fetch("/api/gen", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ desc: 'dinosaur bird' }),
+          body: JSON.stringify({ desc: query }),
         });
         const data = await response.json();
-        document.querySelector('.ai-img-url').innerText = data.result;
+        document.querySelector('.ai-img-url').innerText = `${data.query} + ${data.result}`;
         console.log(data); 
+
+        if(data.result) {
+            const fetchedImg = await fetch(data.result); 
+            const blobImg = await fetchedImg.blob(); 
+            const fileImg = new File([blobImg], 'img.png', { type: blobImg.type }); 
+
+            let id = -1; 
+            if(fileImg) {
+                id = await palace.addMemory(fileImg); 
+            }
+            
+            if(id !== -1) {
+                AddMemory(palace.Memories.find(mem => mem.id === id)); 
+                palace.Save(); 
+            }
+    
+        }
 
         
         // const data = await response.json();

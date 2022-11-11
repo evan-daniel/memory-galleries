@@ -74,14 +74,15 @@ body {
 
 .buttons {
     display: flex; 
+    flex-wrap: wrap; 
 }
 
 /* START */
 
-.tst-ai-img, 
+.ai-img-url, 
 .clear, 
 .start-button {
-    width: 8rem; 
+    flex: 1 1 33%; 
     height: 4rem; 
     
     color: #00F; 
@@ -93,6 +94,10 @@ body {
     display: flex; 
     justify-content: center;
     align-items: center;
+}
+.ai-img-url {
+    background-color: #ccc; 
+    border-radius: 0; 
 }
 
 /* LOCI DATA */

@@ -1,6 +1,5 @@
-// import express from 'express'; 
-// import dotenv from 'dotenv'; 
-// import { Configuration, OpenAIApi } from "openai";
+
+// IMPORTS
 
 const express = require('express'); 
 
@@ -15,32 +14,46 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi.OpenAIApi(configuration);
 
+// SERVER
 
 const app = express(); 
 
 app.use(express.urlencoded());
 app.use(express.json());
+console.log('RUNNING SERVER'); 
 
-app.post('/api/generate', async (req, res) => {
-    console.log('POST', req.body.desc); 
+app.post('/api/gen', async (req, res) => {
 
+    // console.log('POST', req.body.desc); 
+
+    // PRODUCTION
+    
     const img = await openai.createImage({
       prompt: req.body.desc,
       n: 1,
       size: "512x512",
     });
-    // res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+    res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
     res.status(200).json({ result: img.data.data[0].url }); 
     
     // TESTING
-    // SEND A RESULT WE KNOW WE WILL SUCCEED
+    
+    // res.status(200).json({ 
+    //   result: 'https://cdn.wikimg.net/en/strategywiki/images/6/6c/Zelda_ALttP_Quarreling_brothers.png', 
+    //   query: req.body.desc, 
+    // }); 
+
     // res.status(200).json({ result: 'PHLEGMER' }); 
     
 }); 
 
-// app.use(express.static('public')); 
-// app.listen(3000, () => console.log('Listening on port 3000.'));
+// app.get('/api/gen', async (req, res) => {
+//   console.log('GET')
+//   console.log('FROM THE SERVER'); 
+//   res.status(200).json({ result: 'https://cdn.wikimg.net/en/strategywiki/images/6/6c/Zelda_ALttP_Quarreling_brothers.png' }); 
 
-// export default app; 
+// })
 
 module.exports = app; 
+
+// app.listen(3000); 

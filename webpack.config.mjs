@@ -1,7 +1,13 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path'; 
 
+import dotenv from 'dotenv'; 
+dotenv.config(); 
+
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
+
+console.log('PORT', process.env.PORT); 
+const po = process.env.PORT; 
 
 export default {
   mode: 'development', 
@@ -12,6 +18,9 @@ export default {
   }, 
   devServer: {
     static: './public',
+    proxy: { 
+      '/api': `http://localhost:3000`, 
+    }
   },
   output: {
     filename: '[name].bundle.js',
