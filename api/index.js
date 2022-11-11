@@ -1,16 +1,19 @@
-import express from 'express'; 
-import dotenv from 'dotenv'; 
+// import express from 'express'; 
+// import dotenv from 'dotenv'; 
 // import { Configuration, OpenAIApi } from "openai";
 
-// const express = require('express'); 
+const express = require('express'); 
 
-// const dotenv = require('dotenv'); 
+const dotenv = require('dotenv'); 
 dotenv.config(); 
 
-// const configuration = new Configuration({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
-// const openai = new OpenAIApi(configuration);
+const OpenAIApi = require('openai'); 
+const Configuration = OpenAIApi.Configuration; 
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi.OpenAIApi(configuration);
 
 
 const app = express(); 
@@ -38,6 +41,6 @@ app.post('/api/generate', async (req, res) => {
 // app.use(express.static('public')); 
 // app.listen(3000, () => console.log('Listening on port 3000.'));
 
-export default app; 
+// export default app; 
 
-// module.exports = app; 
+module.exports = app; 
