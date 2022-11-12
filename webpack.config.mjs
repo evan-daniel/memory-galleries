@@ -1,16 +1,10 @@
+import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path'; 
 
-import dotenv from 'dotenv'; 
-dotenv.config(); 
-
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
-console.log('PORT', process.env.PORT); 
-const po = process.env.PORT; 
-
 export default {
-  mode: 'development', 
   entry: {
     home: './src/js/home.js',
     map: './src/js/map.js', 

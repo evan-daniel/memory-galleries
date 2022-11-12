@@ -114,15 +114,38 @@ class Palace {
         this.Memories.find(mem => mem.id === id).assertion = assertion; 
     }
 
+    erase_mem(id) {
+        if(typeof id !== 'number' || id < 0) {
+            console.error('TRIED TO ERASE THAT DOES NOT EXIST'); 
+            return; 
+        }
+        
+        this.Memories.splice(this.mem_idx(id), 1); 
+    }
+
+    // CONVENIENCE
+    
+    mem_ref(id) {
+        return this.Memories.find(mem => mem.id === id); 
+    }
+
+    mem_idx(id) {
+        return this.Memories.findIndex(mem => mem.id === id); 
+    }
+
     getRoomsPerSide() {
         return this.RoomsPerSide; 
     }
+
+    // BUILD INITIATES OPFS
 
     async Build() {
         this.Storage = {}; 
         this.Storage.Root = await navigator.storage.getDirectory(); 
         this.Storage.MemoryImages = await this.Storage.Root.getDirectoryHandle('tmp', { 'create': true }); 
     }
+
+    // SAVES TO LOCAL STORAGE
 
     Save() {
         const pal = {

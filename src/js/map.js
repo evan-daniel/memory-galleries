@@ -3,6 +3,8 @@ import '../css/map.css';
 
 import Palace from './Palace.js'; 
 
+console.log('mode', process.env.NODE_ENV); 
+
 window.addEventListener('DOMContentLoaded', async () => {
     const roomsPerSide = 16; 
     document.documentElement.style.setProperty('--rooms-per-side', `${roomsPerSide}`); 
@@ -95,20 +97,22 @@ window.addEventListener('DOMContentLoaded', async () => {
         ass.addEventListener('focus', assertionGainFocus); 
         ass.addEventListener('focusout', assertionSubmit); 
         ass.addEventListener('keydown', assertionKeydown); 
+
+        // BIND TO ERASE
+
+        memoryRef.querySelector('.erase-memory').addEventListener('click', () => erase_memory(memoryRef)); 
         
-        if(palaceMemory.type === 'file') {
-            const imgFile = palaceMemory.handle; 
-            const memoryImg = await imgFile.getFile();
-            const rdr = new FileReader(); 
-            
-            rdr.addEventListener('load', load => {
-                const res = rdr.result; 
-                memoryRef.querySelector('.memory-img').style.backgroundImage = `URL("${res}")`; 
-            }); 
-            rdr.readAsDataURL(memoryImg); 
-        } else if(palaceMemory.type === 'url') {
-            memoryRef.querySelector('.memory-img').style.backgroundImage = `URL("${palaceMemory.fileName})`
-        }
+        // ADD THE FILE
+        
+        const imgFile = palaceMemory.handle; 
+        const memoryImg = await imgFile.getFile();
+        const rdr = new FileReader(); 
+        
+        rdr.addEventListener('load', load => {
+            const res = rdr.result; 
+            memoryRef.querySelector('.memory-img').style.backgroundImage = `URL("${res}")`; 
+        }); 
+        rdr.readAsDataURL(memoryImg); 
     }
     
     for(let i = 0; i < palace.Memories.length; ++i) {
@@ -125,24 +129,37 @@ window.addEventListener('DOMContentLoaded', async () => {
             room.setAttribute('column', x); 
             room.setAttribute('row', y);
             room.setAttribute('active', palace.Rooms[y][x].active);  
-            room.setAttribute('has-memory', 'false'); 
+            room.setAttribute('memory-id', '-1'); 
             roomsDom.appendChild(room); 
 
             const mem_id = palace.Rooms[y][x].memory; 
             if(mem_id !== -1) {
                 const mem = palace.Memories.find(mem => mem.id === mem_id); 
                 if(mem) {
-                    if(mem.type === 'file') {
-                        addBgImg(mem.handle, room); 
-                    } else if(mem.type === 'url') {
-                        room.style.backgroundImage = `URL("${mem.fileName}")`
-                    }
-                    room.setAttribute('has-memory', 'true'); 
+                    addBgImg(mem.handle, room); 
+                    room.setAttribute('memory-id', `${mem_id}`); 
                 }
             }
         }
     }
     document.querySelector('.floor-plan').append(roomsDom); 
+
+    // ERASE MEMORY
+
+    const erase_memory = target => {
+        if(!(target instanceof Element)) {
+            return; 
+        }
+        
+        const id = +target?.getAttribute('id'); 
+        palace.erase_mem(id); 
+        palace.Save(); 
+        target.remove(); 
+
+        // SEARCH FOR ALL ROOMS WITH THE MEMORY AND DECOUPLE
+
+        document.querySelectorAll(`.room[memory-id = "${id}"]`).forEach(room => rem_room_mem(room)); 
+    }; 
     
     /* 
     * 
@@ -199,9 +216,17 @@ window.addEventListener('DOMContentLoaded', async () => {
         palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].memory = id; 
         palace.Save(); 
         addBgImg(palace.Memories.find(mem => mem.id === id).handle, room); 
-        room.setAttribute('has-memory', 'true'); 
-        
+        room.setAttribute('memory-id', `${id}`); 
+
     }, false); 
+
+    // REMOVE MEMORIES FROM ROOMS
+    
+    const rem_room_mem = target => {
+        target.setAttribute('memory-id', '-1'); 
+        target.style.backgroundImage = ''; 
+    }
+    const rem_all_room_mem = () => document.querySelectorAll('.room:not([memory-id = "-1"])').forEach(room => rem_room_mem(room)); 
     
     document.addEventListener('dragend', removeDrags); 
 
@@ -220,10 +245,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             mem.remove(); 
         }); 
 
-        document.querySelectorAll('.room[has-memory = "true"]').forEach(room => {
-            room.style.backgroundImage = ''; 
-            room.setAttribute('has-memory', 'false'); 
-        }); 
+        rem_all_room_mem(); 
     })
     
     /* 
@@ -281,10 +303,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             console.log('SUCCEED (POSTING)', data); 
             
             // DEV / PROD TOGGLE
-            // GET THE IMAGE AS-IS; NO NEED FOR ADDING PREAMBLE
+            // : PREAMBLE
             
-            // const fetchedImg = await fetch(data.result); 
-            const fetchedImg = await fetch(`data:image/png;base64,${data}`); 
+            const fetchedImg = process.env.NODE_ENV === 'development' ? await fetch(data.result) : await fetch(`data:image/png;base64,${data}`); 
             
             const blobImg = await fetchedImg.blob(); 
             const fileImg = new File([blobImg], 'img.png', { type: blobImg.type }); 
