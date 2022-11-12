@@ -280,8 +280,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         if(data) {
             console.log('SUCCEED (POSTING)', data); 
             
-            const fetchedImg = await fetch(data.result); 
-            // const fetchedImg = await fetch(`data:image/png;base64,${data}`); 
+            // DEV / PROD TOGGLE
+            // GET THE IMAGE AS-IS; NO NEED FOR ADDING PREAMBLE
+            
+            // const fetchedImg = await fetch(data.result); 
+            const fetchedImg = await fetch(`data:image/png;base64,${data}`); 
+            
             const blobImg = await fetchedImg.blob(); 
             const fileImg = new File([blobImg], 'img.png', { type: blobImg.type }); 
 
