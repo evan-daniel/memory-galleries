@@ -14,13 +14,47 @@
             <div class="interface">
                 <div class="buttons">
                     <a class="start-button" href="/game">START</a>
+                    <div class="add-memory">ADD</div>
                     <div class="clear">CLEAR</div>
-                    <input class="ai-img-query">
-                    <div class="ai-img-url">none</div>
                 </div>
+                
+                <div class="memories"></div>
 
-                <div class="memories">
-                    <input class="memory" type="file" accept="image/jpeg, image/png, image/jpg">
+                <!-- DISPLAY THE INTERFACE DURING DEV -->
+                <!-- <div class="add-memory-interface" style="display: block;"> -->
+                    
+                <div class="add-memory-interface" style="display: none;">
+                    <div class="close-add-memory-interface">x</div>
+
+                    <div class="add-assertion">
+                        <div class="instruction">
+                            WHAT ARE YOU TRYING TO MEMORIZE
+                        </div>
+                        <div class="assertion-interface" contenteditable="true">
+                            TYPE HERE
+                        </div>
+                    </div>
+
+                    <div class="add-association">
+                        <div class="instruction">
+                            WHAT DO YOU ASSOCIATE IT WITH
+                        </div>
+                        <div class="association-interface" contenteditable="true">
+                            TYPE HERE
+                        </div>
+                    </div>
+                    
+                    <button class="add-memory-submit">
+                        SUBMIT
+                    </button>
+
+                    <div class="add-manual-file">
+                        <div class="instruction">
+                            … OR ADD AN IMAGE OF YOUR OWN
+                        </div>
+                        <input class="add-manual-file-interface" type="file" accept="image/jpeg, image/png, image/jpg">
+                    </div>
+                    
                 </div>
             </div>
         </div>

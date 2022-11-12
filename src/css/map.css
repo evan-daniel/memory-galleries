@@ -1,3 +1,4 @@
+
 /* FULL-PAGE BODY */
 
 body {
@@ -6,8 +7,6 @@ body {
     right: 0; 
     bottom: 0; 
     left: 0; 
-    
-    font-family: 'Futura', sans-serif; 
 }
 
 /* SCHEMATIC CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
@@ -19,10 +18,9 @@ body {
 /* INTERFACE */
 
 .interface {
+    position: relative; 
     flex: 0 1 100%; 
     
-    background-color: #aaf;
-
     display: flex; 
     flex-direction: column; 
 }
@@ -34,7 +32,7 @@ body {
     width: 100vmin; 
     height: 100vmin; 
 
-    background-color: #faf;
+    background-color: #eee;
 
     display: grid; 
     grid-template-columns: repeat(var(--rooms-per-side), 1fr);
@@ -50,24 +48,13 @@ body {
 
     display: relative; 
 }
+
 .room[active = 'true'] {
-    background-color: #ccf; 
+    background-color: #ccc; 
 }
+
 .room[dragover = "true"] {
-    background-color: #f0f;
-}
-
-
-/* LOCI */
-
-.loci {
-    display: absolute; 
-    top: 0; 
-    right: 0; 
-    left: 0; 
-    height: 16px; 
-
-    background-color: #aaf; 
+    background-color: #fff;
 }
 
 /* BUTTONS */
@@ -77,15 +64,10 @@ body {
     flex-wrap: wrap; 
 }
 
-/* START */
-
-.ai-img-url, 
-.clear, 
-.start-button {
+.buttons > * {
     flex: 1 1 33%; 
     height: 4rem; 
     
-    color: #00F; 
     background-color: #888; 
     
     cursor: pointer; 
@@ -95,27 +77,23 @@ body {
     justify-content: center;
     align-items: center;
 }
-.ai-img-url {
-    background-color: #ccc; 
-    border-radius: 0; 
-}
 
-/* LOCI DATA */
+/* MEMORIES */
 
 .memories {
+    overflow: scroll; 
     flex: 1 1 100%; 
     
     background-color: #aaa; 
 
     display: flex; 
     flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start; 
+    align-content: flex-start; 
 }
 
 .memory {
     position: relative; 
-    flex: 0 1 33%; 
+    flex: 0 1 33.33%; 
     height: 33%; 
 
     background-color: #888; 
@@ -146,9 +124,24 @@ body {
     left: 0; 
     height: 2.4em; 
 
-    background-color: #cece; 
+    background-color: #eee; 
 
     display: flex; 
     justify-content: center;
     align-items: center;
+}
+
+/* ADD MEMORY INTERFACE */
+
+.add-memory-interface {
+    z-index: 100; 
+    position: absolute; 
+
+    --offset: 2rem; 
+    top: var(--offset); 
+    right: var(--offset); 
+    bottom: var(--offset); 
+    left: var(--offset); 
+
+    background-color: #444;
 }

@@ -206,11 +206,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
                 // LOAD IMAGE TO MESH IMMEDIATELY
                 
-                LoadImgToMesh(mem.handle, obstacle.object); 
+                // LoadImgToMesh(mem.handle, obstacle.object); 
 
-                // targetedLocus.mem = mem; 
-                // targetedLocus.mesh = obstacle.object; 
-                // elAns.focus(); 
+                targetedLocus.mem = mem; 
+                targetedLocus.mesh = obstacle.object; 
+                elAns.focus(); 
             }
         }; 
     }); 

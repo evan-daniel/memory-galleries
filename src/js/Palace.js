@@ -2,16 +2,14 @@ class Palace {
 
     constructor() {
 
-
         // SETUP
-        this.RoomsPerSide = 16; 
 
+        this.RoomsPerSide = 16; 
         
         // MEMORIES
         
         this.Memories = []; 
         this.MemoryCount = 0; 
-
 
         // ROOMS 
         
@@ -22,13 +20,16 @@ class Palace {
                 this.Rooms[y][x] = {
                     
                     // CONVENIENCE
+                    
                     x: x, 
                     y: y, 
 
                     // WHETHER YOU CAN WALK IN THE ROOM
+
                     active: false, 
                     
                     // THE MEMORIES
+                    
                     memory: -1, 
                 }
             }
@@ -83,7 +84,9 @@ class Palace {
             // SUCCEEDED IN WRITING THE FILE
 
             value = id; 
-            // COMMENTED OUT TO PREVENT SAVING LOTS OF IMAGES DURING TESTING
+
+            // COMMENT OUT TO PREVENT SAVING LOTS OF IMAGES DURING TESTING
+
             ++this.MemoryCount; 
 
             const mem = {
@@ -107,26 +110,9 @@ class Palace {
         
     }
 
-    async addUrlMemory(url) {
-        if(!url) {
-            console.error('TRIED ADDING A URL MEMORY WITHOUT A URL'); 
-            return -1; 
-        }
-
-        const mem = {
-            type: 'url', 
-            id: ++this.MemoryCount, 
-            extension: 'png', 
-            fileName: url, 
-            assertion: '',
-        }
-        
-        
-        this.Memories.push(mem); 
-        
-        return mem.id; 
-    
-    }; 
+    set_mem_assertion(id, assertion) {
+        this.Memories.find(mem => mem.id === id).assertion = assertion; 
+    }
 
     getRoomsPerSide() {
         return this.RoomsPerSide; 

@@ -18,6 +18,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     palace.Save(); 
 
+    /* 
+    * 
+    * 
+    * MEMORIES
+    * 
+    * 
+    */
 
     // ASSERTIONS
 
@@ -108,7 +115,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         AddMemory(palace.Memories[i]); 
     }
 
-
     // MAKE DOM FLOOR PLAN
     
     const roomsDom = document.createDocumentFragment('div'); 
@@ -138,6 +144,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     document.querySelector('.floor-plan').append(roomsDom); 
     
+    /* 
+    * 
+    * 
+    * ROOM MANIPULATION STUFF
+    * 
+    * 
+    */
     
     // ACTIVATE/DEACTIVATE ROOM
     
@@ -158,7 +171,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }); 
 
     document.querySelector('.floor-plan').addEventListener('mouseup', () => palace.Save()); 
-
 
     // PUT MEMORY INTO ROOMS
 
@@ -193,7 +205,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     document.addEventListener('dragend', removeDrags); 
 
-
     // CLEAR THE MAP
 
     document.querySelector('.clear').addEventListener('click', click => {
@@ -215,45 +226,62 @@ window.addEventListener('DOMContentLoaded', async () => {
         }); 
     })
     
-    // SAVE FILE INPUT
+    /* 
+    * 
+    * 
+    * ADD MEMORY STUFF
+    * 
+    * 
+    */
 
-    const input = document.querySelector('.memories input'); 
-    input.addEventListener('change', async change => {
-        const file = input.files[0]; 
-        let id = -1; 
-        if(file) {
-            id = await palace.addMemory(file); 
-        }
+    // MEMORY INTERFACE VISIBILITY
+    
+    const addMemoryInterface = document.querySelector('.add-memory-interface'); 
+    document.querySelector('.add-memory').addEventListener('click', () => addMemoryInterface.style.display = 'block'); 
+
+    const res_add_mem_inf = () => {
+        addMemoryInterface.querySelector('.assertion-interface').innerText = 'TYPE HERE'
+        addMemoryInterface.querySelector('.association-interface').innerText = 'TYPE HERE'
+        addMemoryInterface.style.display = 'none'; 
+    }; 
+    document.querySelector('.close-add-memory-interface').addEventListener('click', res_add_mem_inf); 
+
+    // SUBMIT A NEW MEMORY FROM THE POP-UP INTERFACE
+    
+    document.querySelector('.add-memory-submit').addEventListener('click', async () => {
+
+        // CHECK
         
-        if(id !== -1) {
-            AddMemory(palace.Memories.find(mem => mem.id === id)); 
-            palace.Save(); 
-
-            
-        }
-    }); 
-
-    document.querySelector('.ai-img-url').addEventListener('click', async () => {
-
-        const query = document.querySelector('.ai-img-query').value; 
-        console.log('POSTING…', query); 
-        if(query === '') {
+        const ent_assoc = document.querySelector('.association-interface').innerText; 
+        const assertion = addMemoryInterface.querySelector('.assertion-interface').innerText; 
+        if(!ent_assoc || ent_assoc === '' || ent_assoc === 'TYPE HERE') {
+            console.error('SUBMITTED — ABANDONED BECAUSE THE ASSOCIATION WAS EMPTY'); 
             return; 
         }
+        console.log('POSTING…', ent_assoc); 
+
+        // SEND API REQUEST FOR AI IMAGE
         
         const response = await fetch("/api/gen", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ desc: query }),
+          body: JSON.stringify({ desc: ent_assoc }),
         });
         const data = await response.json();
-        document.querySelector('.ai-img-url').innerText = `${data.query} + ${data.result}`;
-        console.log(data); 
+        
+        // RESET THE ADD MEMORY INTERFACE
 
-        if(data.result) {
+        res_add_mem_inf(); 
+        
+        // GO AHEAD AND ADD A MEMORY
+        
+        if(data) {
+            console.log('SUCCEED (POSTING)', data); 
+            
             const fetchedImg = await fetch(data.result); 
+            // const fetchedImg = await fetch(`data:image/png;base64,${data}`); 
             const blobImg = await fetchedImg.blob(); 
             const fileImg = new File([blobImg], 'img.png', { type: blobImg.type }); 
 
@@ -262,36 +290,51 @@ window.addEventListener('DOMContentLoaded', async () => {
                 id = await palace.addMemory(fileImg); 
             }
             
+            // IF WE'VE ADDED A MEMORY TO THE PALACE IN MEMORY
+            
             if(id !== -1) {
+
+                // ADD AN ASSERTION IF IT'S THERE
+
+                if(assertion && assertion !== '' && assertion !== 'TYPE HERE') {
+                    palace.set_mem_assertion(id, assertion); 
+                }
+
+                // ADD TO THE DOM
+                // ADD TO THE STORAGE
+                
                 AddMemory(palace.Memories.find(mem => mem.id === id)); 
                 palace.Save(); 
             }
     
         }
+    }); 
 
+    // MANUALLY UPLOAD FILE
+
+    const manualInput = document.querySelector('.add-manual-file-interface'); 
+    manualInput.addEventListener('change', async change => {
+        const assertion = addMemoryInterface.querySelector('.assertion-interface').innerText; 
         
-        // const data = await response.json();
-        // document.querySelector('.ai-img-url').innerText = data.result;
-    
+        const file = manualInput.files[0]; 
+        let id = -1; 
+        if(file) {
+            id = await palace.addMemory(file); 
+        }
         
+        if(id !== -1) {
+
+            // ADD AN ASSERTION IF IT EXISTS
+
+            if(assertion && assertion !== '' && assertion !== 'TYPE HERE') {
+                palace.set_mem_assertion(id, assertion); 
+            }
+            
+            AddMemory(palace.Memories.find(mem => mem.id === id)); 
+            palace.Save(); 
+        }
     }); 
 
 }); 
 
 const l = console.log; 
-
-/* 
-
-SAMPLE ANSWERS
-
-parker prall stace greene
-santayana ducasse cassirer langer
-dilman gotshalk arnold isenberg
-monroe beardsley nelson goodman
-ja passmore maurice mandelbaum
-frank sibley richard wollheim
-roger scruton stanley cavell
-bernard bosanquet
-wilhelm dilthey
-
-*/ 
