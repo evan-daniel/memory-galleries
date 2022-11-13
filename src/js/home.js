@@ -28,9 +28,13 @@ window.addEventListener('DOMContentLoaded', () => {
     
     palace_dom.querySelector('.palace-key').innerText = pal_key; 
 
-    // CLICKING A PALACE REDIRECTS TO THE EDIT PAGE
+    // COUPLE EVENTS
     
-    palace_dom.addEventListener('click', () => edit_pal(pal_key)); 
+    palace_dom.querySelector('.palace-key').addEventListener('click', () => edit_pal(pal_key)); 
+    palace_dom.querySelector('.erase-palace').addEventListener('click', () => {
+      erase_pal(pal_key); 
+      palace_dom.remove(); 
+    }); 
   }; 
   for(let palace of palaces.keys) {
     new_dom_pal(palace); 
@@ -55,6 +59,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.new-palace-submit').value = ''; 
   }); 
+
+  // ERASE A PALACE
+
+  const erase_pal = pal_key => {
+    console.log('ERASING', pal_key); 
+    palaces.keys.splice(palaces.keys.indexOf(pal_key), 1); 
+    if(palaces.active === pal_key) {
+      palaces.active = ''; 
+    }
+    save_palaces(); 
+  }; 
 
   // REDIRECT FROM PALACE
 

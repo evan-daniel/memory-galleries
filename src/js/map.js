@@ -184,6 +184,18 @@ window.addEventListener('DOMContentLoaded', async () => {
         const room = clickRoom.target; 
         
         if(room.classList.contains('room') && clickRoom.buttons === 1) {
+
+            // IF USER CLICKS ON A ROOM WITH A MEMORY, DECOUPLE
+            
+            if(room.getAttribute('memory-id') !== '-1' || room.style.backgroundImage) {
+                rem_room_mem(room); 
+                palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].memory = -1; 
+                palace.Save(); 
+                return; 
+            }
+            
+            // TOGGLE THE ACTIVITY OF THE ROOM
+            
             const act = room.getAttribute('active') !== 'true'; 
             room.setAttribute('active', act); 
             palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].active = act; 

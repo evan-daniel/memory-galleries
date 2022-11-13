@@ -16,3 +16,13 @@
     justify-content: center;
     align-items: center;
 }
+
+.erase-palace {
+    height: 2rem; 
+    width: 2rem; 
+    border: 1px solid #000; 
+
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
