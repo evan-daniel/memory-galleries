@@ -9,10 +9,21 @@
     <body>
         LociAI
         <div>
-            <a href="/map">BUILD A MAP</a>
+            <input class="new-palace-key" placeholder="NEW PALACE NAME">
+            <button class="new-palace-submit">SUBMIT</button>
         </div>
         <div>
-            <a href="/game">PLAY A GAME</a>
+            <a href="/map">EDIT YOUR MOST RECENT PALACE</a>
         </div>
+        <div>
+            <a href="/game">PLAY WITH YOUR MOST RECENT PALACE</a>
+        </div>
+        <div class="palaces"></div>
+
+        <template type="palace">
+            <div class="palace">
+                <div class="palace-key">NO NAME</div>
+            </div>
+        </template>
     </body>
 </html>

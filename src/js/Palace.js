@@ -1,6 +1,10 @@
 class Palace {
 
-    constructor() {
+    constructor(key) {
+        
+        // KEY DIFFERENTIATES PALACES IN LOCALSTORAGE
+
+        this.key = key ? key : 'tmp'; 
 
         // SETUP
 
@@ -142,7 +146,7 @@ class Palace {
     async Build() {
         this.Storage = {}; 
         this.Storage.Root = await navigator.storage.getDirectory(); 
-        this.Storage.MemoryImages = await this.Storage.Root.getDirectoryHandle('tmp', { 'create': true }); 
+        this.Storage.MemoryImages = await this.Storage.Root.getDirectoryHandle(this.key, { 'create': true }); 
     }
 
     // SAVES TO LOCAL STORAGE
@@ -170,7 +174,7 @@ class Palace {
         
         console.log('SAVE', pal, this); 
         
-        localStorage.setItem('palace', JSON.stringify(pal)); 
+        localStorage.setItem(this.key, JSON.stringify(pal)); 
     }
 
 }

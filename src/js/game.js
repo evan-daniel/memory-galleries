@@ -7,11 +7,19 @@ import Palace from './Palace.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    // VARIABLES
+    // GET PALACES FROM LOCAL STORAGE
     
-    const palace = new Palace(); 
-    const storagePalace = JSON.parse(localStorage.getItem('palace')); 
+    const palaces = JSON.parse(localStorage.getItem('palaces')); 
+    if(!palaces || !palaces.active) {
+        window.location = '/'; 
+    }
+
+    // INSTANTIATE
+    
+    const palace = new Palace(palaces.active); 
     await palace.Build(); 
+    
+    const storagePalace = JSON.parse(localStorage.getItem(palaces.active)); 
     if(storagePalace) {
         palace.load(storagePalace); 
     }

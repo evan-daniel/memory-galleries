@@ -3,17 +3,26 @@ import '../css/map.css';
 
 import Palace from './Palace.js'; 
 
-console.log('mode', process.env.NODE_ENV); 
-
 window.addEventListener('DOMContentLoaded', async () => {
-    const roomsPerSide = 16; 
+    
+    // GET PALACES FROM LOCAL STORAGE
+    
+    const palaces = JSON.parse(localStorage.getItem('palaces')); 
+    if(!palaces || !palaces.active) {
+        window.location = '/'; 
+    }
+    
+    // INSTANTIATE PALACE
+    
+    let palace = new Palace(palaces.active); 
+    await palace.Build(); 
+    const roomsPerSide = palace.getRoomsPerSide(); 
     document.documentElement.style.setProperty('--rooms-per-side', `${roomsPerSide}`); 
 
-    // INSTANTIATE PALACE
+    // LOAD LOCALSTORAGE DATA IF IT EXISTS
+    // SAVE NO MATTER WHAT
 
-    let palace = new Palace(); 
-    const storagePalace = JSON.parse(localStorage.getItem('palace')); 
-    await palace.Build(); 
+    const storagePalace = JSON.parse(localStorage.getItem(palaces.active)); 
     if(storagePalace) {
         await palace.load(storagePalace); 
         console.log(palace); 
@@ -37,7 +46,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const assertionSubmit = sub => {
         const mem = palace.Memories.find(mem => mem.id === +sub.target.parentElement.getAttribute('id')); 
         mem.assertion = sub.target.innerText; 
-        l(mem); 
+        console.log(mem); 
         palace.Save(); 
     }; 
 
@@ -202,7 +211,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }); 
 
     document.querySelector('.floor-plan').addEventListener('drop', drop => {
-        l(drop); 
+        console.log(drop); 
         
         const room = drop.target; 
         const id = +drop.dataTransfer.getData('text'); 
@@ -361,5 +370,3 @@ window.addEventListener('DOMContentLoaded', async () => {
     }); 
 
 }); 
-
-const l = console.log; 
