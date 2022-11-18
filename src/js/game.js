@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     const storagePalace = JSON.parse(localStorage.getItem(palaces.active)); 
     if(storagePalace) {
-        palace.load(storagePalace); 
+        await palace.load(storagePalace); 
     }
     
     const rooms = palace.Rooms; 
@@ -103,23 +103,25 @@ window.addEventListener('DOMContentLoaded', async () => {
             
             const MemoryId = palace.Rooms[y][x].memory; 
             if(MemoryId !== -1) {
-                const TestMat = new THREE.MeshBasicMaterial( { color: 0x0000ff }); 
+                const TestMat = new THREE.MeshBasicMaterial( { color: 0xff8888 }); 
                 const loci_mesh = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), TestMat); 
                 loci_mesh.material.side = THREE.DoubleSide; 
                 loci_mesh.position.set(x * WallWidth, 2.5, y * WallWidth + WallWidth / 2); 
-                loci_mesh.rotation.y -= Math.PI / 4; 
+                loci_mesh.rotation.y += Math.PI / 4; 
                 loci_mesh.name = 'locus'; 
                 loci_mesh.custom = {
                     id: MemoryId, 
                 }; 
                 scene.add(loci_mesh); 
+
+                LoadImgToMesh(palace.Memories[palace.mem_idx(MemoryId)].handle, loci_mesh); 
             }
         }
     }
 
     // LOAD IMG TO WALL
 
-    const LoadImgToMesh = async (fileHandle, mesh) => {
+    async function LoadImgToMesh (fileHandle, mesh) {
         if(!fileHandle || !mesh) {
             return; 
         }
@@ -148,13 +150,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     // USER WRITES MEMORY CONTENT
     
     elAns.addEventListener('keydown', async keydown => {
-        console.log(keydown); 
-        
         if(keydown.key === 'Enter') {
             document.activeElement.blur(); 
             
             if(elAns.innerText === targetedLocus.mem.assertion) {
-                LoadImgToMesh(targetedLocus.mem.handle, targetedLocus.mesh); 
+                // LoadImgToMesh(targetedLocus.mem.handle, targetedLocus.mesh); 
+                const TestMat = new THREE.MeshBasicMaterial( { color: 0x8888ff }); 
+                TestMat.side = THREE.DoubleSide; 
+                targetedLocus.mesh.material = TestMat; 
             }
         }
     }); 

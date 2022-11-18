@@ -62,9 +62,7 @@ class Palace {
                     fileName: memory.fileName, 
                     assertion: memory.assertion, 
                 }; 
-                if(memory.type === 'file') {
-                    newMemoryObj.handle = await this.Storage.MemoryImages.getFileHandle(`${newMemoryObj.fileName}`); 
-                }
+                newMemoryObj.handle = await this.Storage.MemoryImages.getFileHandle(`${newMemoryObj.fileName}`); 
                 this.Memories.push(newMemoryObj); 
             }
         }; 

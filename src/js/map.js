@@ -326,7 +326,11 @@ window.addEventListener('DOMContentLoaded', async () => {
             // DEV / PROD TOGGLE
             // : PREAMBLE
             
-            const fetchedImg = process.env.NODE_ENV === 'development' ? await fetch(data.result) : await fetch(`data:image/png;base64,${data}`); 
+            // const fetchedImg = process.env.NODE_ENV === 'development' ? await fetch(data.result) : await fetch(`data:image/png;base64,${data}`); 
+
+            // MANUALLY USE PREAMBLE
+            
+            const fetchedImg = await fetch(`data:image/png;base64,${data}`); 
             
             const blobImg = await fetchedImg.blob(); 
             const fileImg = new File([blobImg], 'img.png', { type: blobImg.type }); 
