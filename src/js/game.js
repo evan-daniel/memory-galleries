@@ -206,7 +206,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         camera.getWorldPosition(rayO); 
 
         const raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3, 0, 25);
-        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);   
+        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); 
         const collisions = raycaster.intersectObjects(scene.children, true); 
         for(let obstacle of collisions) {
             if(obstacle.object.name === 'locus') {
@@ -225,7 +225,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }); 
 
     renderer.domElement.addEventListener('mousemove', mousemove => {
-        if(document.pointerLockElement === renderer.domElement) {
+        if(document.pointerLockElement === renderer.domElement && !document.activeElement.classList.contains('ans')) {
             const ROT_SPEED = 1 / 256; 
             camera.rotation.y -= mousemove.movementX * ROT_SPEED; 
             camera.rotation.x -= mousemove.movementY * ROT_SPEED; 
