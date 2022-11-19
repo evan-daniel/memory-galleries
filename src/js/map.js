@@ -56,7 +56,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }; 
 
-
     // CONVENIENCE
     // ADD BACKGROUND IMAGES
 
@@ -117,9 +116,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         const memoryImg = await imgFile.getFile();
         const rdr = new FileReader(); 
         
-        rdr.addEventListener('load', load => {
+        rdr.addEventListener('load', () => {
             const res = rdr.result; 
             memoryRef.querySelector('.memory-img').style.backgroundImage = `URL("${res}")`; 
+
+            const download_ref = memoryRef.querySelector('.download-memory'); 
+            download_ref.setAttribute('href', rdr.result); 
+            download_ref.setAttribute('download', `${palaceMemory.assertion || palaceMemory.id}.png`); 
         }); 
         rdr.readAsDataURL(memoryImg); 
     }

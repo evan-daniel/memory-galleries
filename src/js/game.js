@@ -169,8 +169,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         a: false, 
         s: false, 
         d: false, 
-        f: false, 
-        ' ': false, 
     }; 
     document.addEventListener('keydown', keydown => {
         if(document.activeElement.classList.contains('ans')) {

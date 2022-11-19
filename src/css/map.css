@@ -134,6 +134,7 @@ body {
     align-items: center;
 }
 
+.download-memory, 
 .erase-memory {
     position: absolute; 
     top: 0; 
@@ -152,6 +153,11 @@ body {
     display: flex; 
     justify-content: center;
     align-items: center;
+}
+
+.download-memory {
+    left: unset; 
+    right: 0; 
 }
 
 /* ADD MEMORY INTERFACE */

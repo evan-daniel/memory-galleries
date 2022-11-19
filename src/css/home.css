@@ -2,6 +2,16 @@
     color: #f00; 
 }
 
+/* TITLE */
+
+.title {
+    height: 200px; 
+    width: 200px; 
+    
+    background-color: #aaf; 
+    background-image: URL('../img/bernard_bosanquet.png'); 
+}
+
 /* PALACES */
 
 .palace {
