@@ -1,27 +1,27 @@
 class Palace {
 
-    constructor(key) {
+    constructor(filename) {
         
-        // KEY DIFFERENTIATES PALACES IN LOCALSTORAGE
+        // DIFFERENTIATES PALACES IN LOCALSTORAGE
 
-        this.key = key ? key : 'tmp'; 
+        this.filename = filename || 'tmp'; 
 
         // SETUP
 
-        this.RoomsPerSide = 16; 
+        this.rooms_per_side = 16; 
         
         // MEMORIES
         
-        this.Memories = []; 
-        this.MemoryCount = 0; 
+        this.loci = []; 
+        this.loci_cursor = 0; 
 
         // ROOMS 
         
-        this.Rooms = []; 
-        for(let y = 0; y < this.RoomsPerSide; ++y) {
-            this.Rooms[y] = []; 
-            for(let x = 0; x < this.RoomsPerSide; ++x) {
-                this.Rooms[y][x] = {
+        this.rooms = []; 
+        for(let y = 0; y < this.rooms_per_side; ++y) {
+            this.rooms[y] = []; 
+            for(let x = 0; x < this.rooms_per_side; ++x) {
+                this.rooms[y][x] = {
                     
                     // CONVENIENCE
                     
@@ -34,54 +34,53 @@ class Palace {
                     
                     // THE MEMORIES
                     
-                    memory: -1, 
+                    locus: -1, 
                 }
             }
         }
     }
 
-    async load(palace) {
-        if(!palace.Rooms || palace.Memories === undefined) {
-            console.error('TRIED TO LOAD PALACE THAT WAS MISSING DATA'); 
+    async wrangle(palace) {
+        if(!palace.rooms || palace.loci === undefined) {
+            console.error('TRIED TO LOAD PALACE THAT WAS MISSING FUNDAMENTAL DATA'); 
             return; 
         }
 
         console.log('LOADING…', palace); 
 
-        for(let i = 0; i < this.RoomsPerSide; ++i) {
-            this.Rooms[i] = palace.Rooms[i]; 
+        for(let i = 0; i < this.rooms_per_side; ++i) {
+            this.rooms[i] = palace.rooms[i]; 
         }
 
-        for(let i = 0; i < palace.Memories.length; ++i) {
-            const memory = palace.Memories[i]; 
-            if(memory.id !== undefined && memory.extension && memory.fileName) {
-                const newMemoryObj = {
-                    type: memory.type, 
-                    id: memory.id, 
-                    extension: memory.extension, 
-                    fileName: memory.fileName, 
-                    assertion: memory.assertion, 
+        for(let i = 0; i < palace.loci.length; ++i) {
+            const locus_from_storage = palace.loci[i]; 
+            if(locus_from_storage.id !== undefined && locus_from_storage.extension && locus_from_storage.filename) {
+                const locus_buffer = {
+                    id: locus_from_storage.id, 
+                    extension: locus_from_storage.extension, 
+                    filename: locus_from_storage.filename, 
+                    memory: locus_from_storage.memory, 
                 }; 
-                newMemoryObj.handle = await this.Storage.MemoryImages.getFileHandle(`${newMemoryObj.fileName}`); 
-                this.Memories.push(newMemoryObj); 
+                locus_buffer.handle = await this.storage.mnemonics.getFileHandle(`${locus_buffer.filename}`); 
+                this.loci.push(locus_buffer); 
             }
         }; 
-        this.MemoryCount = palace.Memories.length; 
+        this.loci_cursor = palace.loci_cursor; 
 
     }
 
-    async addMemory(file) {
+    async push_locus(file) {
         let value = -1; 
 
-        const id = this.MemoryCount; 
+        const id = this.loci_cursor; 
         const extension = 'png'; 
         const name = `${id}.${extension}`; 
         
-        const tmpFile = await this.Storage.MemoryImages.getFileHandle(name, { 'create': true }); 
-        const tmpWtr = await tmpFile.createWritable(); 
+        const file_buf = await this.storage.mnemonics.getFileHandle(name, { 'create': true }); 
+        const file_writable = await file_buf.createWritable(); 
         try {
 
-            await tmpWtr.write(file);
+            await file_writable.write(file);
 
             // SUCCEEDED IN WRITING THE FILE
 
@@ -89,90 +88,83 @@ class Palace {
 
             // COMMENT OUT TO PREVENT SAVING LOTS OF IMAGES DURING TESTING
 
-            ++this.MemoryCount; 
+            ++this.loci_cursor; 
 
-            const mem = {
-                type: 'file', 
+            const locus = {
                 id: id, 
                 extension: extension, 
-                fileName: name, 
-                handle: tmpFile, 
-                assertion: '',
+                filename: name, 
+                handle: file_buf, 
+                memory: '',
             }
             
+            this.loci.push(locus); 
             
-            this.Memories.push(mem); 
-            
-
         } finally {
-            await tmpWtr.close();
+            await file_writable.close();
         }
 
         return value; 
         
     }
 
-    set_mem_assertion(id, assertion) {
-        this.Memories.find(mem => mem.id === id).assertion = assertion; 
+    // CONVENIENCE
+    
+    set_locus_memory(id, memory) {
+        this.loci.find(locus => locus.id === id).memory = memory; 
     }
 
-    erase_mem(id) {
+    erase_locus(id) {
         if(typeof id !== 'number' || id < 0) {
             console.error('TRIED TO ERASE THAT DOES NOT EXIST'); 
             return; 
         }
         
-        this.Memories.splice(this.mem_idx(id), 1); 
+        this.loci.splice(this.locus_idx(id), 1); 
     }
-
-    // CONVENIENCE
     
-    mem_ref(id) {
-        return this.Memories.find(mem => mem.id === id); 
+    locus_ref(id) {
+        return this.loci.find(locus => locus.id === id); 
     }
 
-    mem_idx(id) {
-        return this.Memories.findIndex(mem => mem.id === id); 
+    locus_idx(id) {
+        return this.loci.findIndex(locus => locus.id === id); 
     }
 
-    getRoomsPerSide() {
-        return this.RoomsPerSide; 
-    }
+    // INIT IS NECESSARY FOR OPFS
+    // RESPONSIBILITY OF CALLER TO CALL INIT BEFORE WRANGLING
 
-    // BUILD INITIATES OPFS
-
-    async Build() {
-        this.Storage = {}; 
-        this.Storage.Root = await navigator.storage.getDirectory(); 
-        this.Storage.MemoryImages = await this.Storage.Root.getDirectoryHandle(this.key, { 'create': true }); 
+    async init() {
+        this.storage = {}; 
+        this.storage.root = await navigator.storage.getDirectory(); 
+        this.storage.mnemonics = await this.storage.root.getDirectoryHandle(this.filename, { 'create': true }); 
     }
 
     // SAVES TO LOCAL STORAGE
 
-    Save() {
-        const pal = {
-            Rooms: this.Rooms, 
-            RoomsPerSide: this.RoomsPerSide, 
-            Memories: [], 
+    persist() {
+        const palace = {
+            rooms: this.rooms, 
+            rooms_per_side: this.rooms_per_side, 
+            loci: [], 
         }; 
 
-        this.Memories.forEach(mem => {
-            if(mem.id !== undefined && mem.fileName !== undefined) {
-                pal.Memories.push({
-                    type: mem.type, 
-                    id: mem.id, 
-                    extension: mem.extension, 
-                    fileName: mem.fileName, 
-                    assertion: mem.assertion, 
-                })
+        this.loci.forEach(locus => {
+            if(locus.id !== undefined && locus.filename !== undefined) {
+                palace.loci.push({
+                    id: locus.id, 
+                    extension: locus.extension, 
+                    filename: locus.filename, 
+                    memory: locus.memory, 
+                }); 
             }
         }); 
 
-        pal.MemoryCount = pal.Memories.length; 
+        palace.loci_cursor = this.loci_cursor; 
         
-        console.log('SAVE', pal, this); 
+        console.log('SAVE', palace, this); 
         
-        localStorage.setItem(this.key, JSON.stringify(pal)); 
+        localStorage.setItem(this.filename, JSON.stringify(palace)); 
     }
 
 }

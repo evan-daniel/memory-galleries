@@ -16,6 +16,7 @@ export default {
       '/api': `http://localhost:3000`, 
     }
   },
+  devtool: 'inline-source-map', 
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'public'),

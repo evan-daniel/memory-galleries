@@ -35,14 +35,14 @@ body {
 
 /* ANSWER */
 
-.ans-container {
+.answer {
     position: fixed; 
     bottom: 1rem; 
     left: 1rem; 
     width: 25rem; 
 }
 
-.ans {
+.candidate-answer {
     height: 5rem; 
     margin: 1rem; 
     padding: 1rem;

@@ -15,19 +15,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     // INSTANTIATE PALACE
     
     let palace = new Palace(palaces.active); 
-    await palace.Build(); 
-    const roomsPerSide = palace.getRoomsPerSide(); 
-    document.documentElement.style.setProperty('--rooms-per-side', `${roomsPerSide}`); 
-
+    await palace.init(); 
+    document.documentElement.style.setProperty('--rooms-per-side', `${palace.rooms_per_side}`); 
+    
     // LOAD LOCALSTORAGE DATA IF IT EXISTS
     // SAVE NO MATTER WHAT
 
-    const storagePalace = JSON.parse(localStorage.getItem(palaces.active)); 
-    if(storagePalace) {
-        await palace.load(storagePalace); 
-        console.log(palace); 
+    const palace_data_buf = JSON.parse(localStorage.getItem(palaces.active)); 
+    if(palace_data_buf) {
+        console.log('PALACE DATA', palace_data_buf); 
+        await palace.wrangle(palace_data_buf); 
     }
-    palace.Save(); 
+    console.log('PALACE AFTER INIT', palace); 
+    palace.persist(); 
 
     /* 
     * 
@@ -39,138 +39,138 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // ASSERTIONS
 
-    const assertionGainFocus = input => {
-        input.target.innerText = ''; 
+    const dom_memory_focus = dom_memory_candidate => {
+        dom_memory_candidate.target.innerText = ''; 
     }; 
 
-    const assertionSubmit = sub => {
-        const mem = palace.Memories.find(mem => mem.id === +sub.target.parentElement.getAttribute('id')); 
-        mem.assertion = sub.target.innerText; 
-        console.log(mem); 
-        palace.Save(); 
-    }; 
-
-    const assertionKeydown = keydown => {
+    const dom_memory_keydown = keydown => {
         if(keydown.key === 'Return' || keydown.key === 'Enter') {
             document.activeElement.blur(); 
         }
     }; 
 
+    const dom_memory_submit = sub => {
+        const locus = palace.loci.find(locus => locus.id === +sub.target.parentElement.getAttribute('id')); 
+        locus.memory = sub.target.innerText; 
+        console.log(locus); 
+        palace.persist(); 
+    }; 
+
     // CONVENIENCE
     // ADD BACKGROUND IMAGES
 
-    const addBgImg = async (handle, elem) => {
+    const push_bg_img = async (handle, elem) => {
         const rdr = new FileReader(); 
         rdr.addEventListener('load', () => {
             const res = rdr.result; 
             elem.style.backgroundImage = `URL("${res}")`; 
         }); 
-        const img = await handle.getFile();
-        rdr.readAsDataURL(img); 
+        const mnemonic_file = await handle.getFile();
+        rdr.readAsDataURL(mnemonic_file); 
     }; 
 
     // MAKE DOM MEMORIES
 
-    const AddMemory = async palaceMemory => {
-        if(!palaceMemory) {
-            console.log('ADDING MEMORY DOM ABORTED'); 
+    const push_dom_locus = async locus => {
+        if(!locus) {
+            console.log('ADDING LOCUS DOM ABORTED'); 
             return; 
         }
         
         // GET TEMPLATE
         // SET THINGS THAT WEREN'T IN THE TEMPLATE
         
-        const template = document.querySelector('template[type="memory"]'); 
-        const memory = template.content.cloneNode(true); 
-        memory.querySelector('.assertion').innerText = palaceMemory.assertion ? `${palaceMemory.assertion}` : `${palaceMemory.id} : ${palaceMemory.fileName}`; 
-        const memoryRef = memory.querySelector('.memory')
-        memoryRef.setAttribute('draggable', true); 
-        memoryRef.setAttribute('id', `${palaceMemory.id}`); 
-        document.querySelector('.memories').prepend(memory); 
+        const template = document.querySelector('template[type="locus"]'); 
+        const frag_locus = template.content.cloneNode(true); 
+        frag_locus.querySelector('.memory').innerText = locus.memory ? `${locus.memory}` : `${locus.id} : ${locus.fileName}`; 
+        const ref_dom_locus = frag_locus.querySelector('.locus')
+        document.querySelector('.loci').prepend(frag_locus); 
+        
+        ref_dom_locus.setAttribute('draggable', true); 
+        ref_dom_locus.setAttribute('id', `${locus.id}`); 
         
         // DATA TRANSFER
 
-        memoryRef.addEventListener('dragstart', dragstart => {
-            memoryRef.setAttribute('being-dragged', 'true'); 
-            dragstart.dataTransfer.setData('text', `${palaceMemory.id}`); 
+        ref_dom_locus.addEventListener('dragstart', dragstart => {
+            ref_dom_locus.setAttribute('being-dragged', 'true'); 
+            dragstart.dataTransfer.setData('text', `${locus.id}`); 
         }); 
 
-        memoryRef.addEventListener('dragend', dragend => {
-            memoryRef.setAttribute('being-dragged', 'false'); 
+        ref_dom_locus.addEventListener('dragend', () => {
+            ref_dom_locus.setAttribute('being-dragged', 'false'); 
         }); 
         
         // ASSERTION
         
-        const ass = memoryRef.querySelector('.assertion'); 
-        ass.addEventListener('focus', assertionGainFocus); 
-        ass.addEventListener('focusout', assertionSubmit); 
-        ass.addEventListener('keydown', assertionKeydown); 
+        const memory = ref_dom_locus.querySelector('.memory'); 
+        memory.addEventListener('focus', dom_memory_focus); 
+        memory.addEventListener('keydown', dom_memory_keydown); 
+        memory.addEventListener('focusout', dom_memory_submit); 
 
         // BIND TO ERASE
 
-        memoryRef.querySelector('.erase-memory').addEventListener('click', () => erase_memory(memoryRef)); 
+        ref_dom_locus.querySelector('.locus .erase').addEventListener('click', () => erase_locus(ref_dom_locus)); 
         
         // ADD THE FILE
         
-        const imgFile = palaceMemory.handle; 
-        const memoryImg = await imgFile.getFile();
+        const buf_file_mnemonic = await locus.handle.getFile();
         const rdr = new FileReader(); 
         
         rdr.addEventListener('load', () => {
             const res = rdr.result; 
-            memoryRef.querySelector('.memory-img').style.backgroundImage = `URL("${res}")`; 
+            ref_dom_locus.querySelector('.locus .mnemonic').style.backgroundImage = `URL("${res}")`; 
 
-            const download_ref = memoryRef.querySelector('.download-memory'); 
+            const download_ref = ref_dom_locus.querySelector('.locus .download'); 
             download_ref.setAttribute('href', rdr.result); 
-            download_ref.setAttribute('download', `${palaceMemory.assertion || palaceMemory.id}.png`); 
+            download_ref.setAttribute('download', `${locus.memory || locus.id}.png`); 
         }); 
-        rdr.readAsDataURL(memoryImg); 
+        rdr.readAsDataURL(buf_file_mnemonic); 
     }
     
-    for(let i = 0; i < palace.Memories.length; ++i) {
-        AddMemory(palace.Memories[i]); 
+    for(let i = 0; i < palace.loci.length; ++i) {
+        push_dom_locus(palace.loci[i]); 
     }
 
     // MAKE DOM FLOOR PLAN
     
-    const roomsDom = document.createDocumentFragment('div'); 
-    for(let y = 0; y < roomsPerSide; ++y) {
-        for(let x = 0; x < roomsPerSide; ++x) {
-            const room = document.createElement('div'); 
-            room.classList.add('room'); 
-            room.setAttribute('column', x); 
-            room.setAttribute('row', y);
-            room.setAttribute('active', palace.Rooms[y][x].active);  
-            room.setAttribute('memory-id', '-1'); 
-            roomsDom.appendChild(room); 
+    const dom_rooms = document.createDocumentFragment('div'); 
+    for(let y = 0; y < palace.rooms_per_side; ++y) {
+        for(let x = 0; x < palace.rooms_per_side; ++x) {
+            const dom_room = document.createElement('div'); 
+            dom_room.classList.add('room'); 
+            dom_room.setAttribute('column', x); 
+            dom_room.setAttribute('row', y);
+            dom_room.setAttribute('active', palace.rooms[y][x].active);  
+            dom_room.setAttribute('locus', '-1'); 
+            dom_rooms.appendChild(dom_room); 
 
-            const mem_id = palace.Rooms[y][x].memory; 
+            const mem_id = palace.rooms[y][x].locus; 
             if(mem_id !== -1) {
-                const mem = palace.Memories.find(mem => mem.id === mem_id); 
+                const mem = palace.loci.find(mem => mem.id === mem_id); 
                 if(mem) {
-                    addBgImg(mem.handle, room); 
-                    room.setAttribute('memory-id', `${mem_id}`); 
+                    push_bg_img(mem.handle, dom_room); 
+                    dom_room.setAttribute('locus', `${mem_id}`); 
                 }
             }
         }
     }
-    document.querySelector('.floor-plan').append(roomsDom); 
+    document.querySelector('.map').append(dom_rooms); 
 
-    // ERASE MEMORY
+    // ERASE LOCUS
 
-    const erase_memory = target => {
+    const erase_locus = target => {
         if(!(target instanceof Element)) {
             return; 
         }
         
         const id = +target?.getAttribute('id'); 
-        palace.erase_mem(id); 
-        palace.Save(); 
+        palace.erase_locus(id); 
+        palace.persist(); 
         target.remove(); 
 
-        // SEARCH FOR ALL ROOMS WITH THE MEMORY AND DECOUPLE
+        // SEARCH FOR ALL ROOMS WITH THE LOCUS AND DECOUPLE
 
-        document.querySelectorAll(`.room[memory-id = "${id}"]`).forEach(room => rem_room_mem(room)); 
+        document.querySelectorAll(`.room[locus = "${id}"]`).forEach(room => dom_rem_room_locus(room)); 
     }; 
     
     /* 
@@ -183,17 +183,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // ACTIVATE/DEACTIVATE ROOM
     
-    const roomActivation = clickRoom => {
+    const handle_room_activation = clickRoom => {
         const room = clickRoom.target; 
         
         if(room.classList.contains('room') && clickRoom.buttons === 1) {
 
-            // IF USER CLICKS ON A ROOM WITH A MEMORY, DECOUPLE
+            // IF USER CLICKS ON A ROOM WITH A LOCUS, DECOUPLE
             
-            if(room.getAttribute('memory-id') !== '-1' || room.style.backgroundImage) {
-                rem_room_mem(room); 
-                palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].memory = -1; 
-                palace.Save(); 
+            if(room.getAttribute('locus') !== '-1' || room.style.backgroundImage) {
+                dom_rem_room_locus(room); 
+                palace.rooms[+room.getAttribute('row')][+room.getAttribute('column')].locus = -1; 
+                palace.persist(); 
                 return; 
             }
             
@@ -201,31 +201,31 @@ window.addEventListener('DOMContentLoaded', async () => {
             
             const act = room.getAttribute('active') !== 'true'; 
             room.setAttribute('active', act); 
-            palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].active = act; 
+            palace.rooms[+room.getAttribute('row')][+room.getAttribute('column')].active = act; 
         }
     }
-    document.querySelector('.floor-plan').addEventListener('mousedown', roomActivation); 
-    document.querySelector('.floor-plan').addEventListener('mouseover', mouseover => {
+    document.querySelector('.map').addEventListener('mousedown', handle_room_activation); 
+    document.querySelector('.map').addEventListener('mouseover', mouseover => {
         if(mouseover.fromElement?.classList.contains('room')) {
-            roomActivation(mouseover); 
+            handle_room_activation(mouseover); 
         }
     }); 
 
-    document.querySelector('.floor-plan').addEventListener('mouseup', () => palace.Save()); 
+    document.querySelector('.map').addEventListener('mouseup', () => palace.persist()); 
 
-    // PUT MEMORY INTO ROOMS
+    // PUT LOCUS INTO ROOMS
 
     const removeDrags = () => {
         document.querySelectorAll(['[dragover = "true"]']).forEach(d => d.setAttribute('dragover', 'false')); 
     }; 
     
-    document.querySelector('.floor-plan').addEventListener('dragover', dragover => {
+    document.querySelector('.map').addEventListener('dragover', dragover => {
         dragover.preventDefault(); 
         removeDrags(); 
         dragover.target.setAttribute('dragover', true); 
     }); 
 
-    document.querySelector('.floor-plan').addEventListener('drop', drop => {
+    document.querySelector('.map').addEventListener('drop', drop => {
         console.log(drop); 
         
         const room = drop.target; 
@@ -237,20 +237,20 @@ window.addEventListener('DOMContentLoaded', async () => {
             return; 
         }
 
-        palace.Rooms[+room.getAttribute('row')][+room.getAttribute('column')].memory = id; 
-        palace.Save(); 
-        addBgImg(palace.Memories.find(mem => mem.id === id).handle, room); 
-        room.setAttribute('memory-id', `${id}`); 
+        palace.rooms[+room.getAttribute('row')][+room.getAttribute('column')].locus = id; 
+        palace.persist(); 
+        push_bg_img(palace.loci.find(locus => locus.id === id).handle, room); 
+        room.setAttribute('locus', `${id}`); 
 
     }, false); 
 
     // REMOVE MEMORIES FROM ROOMS
     
-    const rem_room_mem = target => {
-        target.setAttribute('memory-id', '-1'); 
+    const dom_rem_room_locus = target => {
+        target.setAttribute('locus', '-1'); 
         target.style.backgroundImage = ''; 
     }
-    const rem_all_room_mem = () => document.querySelectorAll('.room:not([memory-id = "-1"])').forEach(room => rem_room_mem(room)); 
+    const dom_rem_room_loci = () => document.querySelectorAll('.room:not([locus = "-1"])').forEach(dom_room => dom_rem_room_locus(dom_room)); 
     
     document.addEventListener('dragend', removeDrags); 
 
@@ -258,53 +258,53 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     document.querySelector('.clear').addEventListener('click', click => {
         palace = new Palace(); 
-        palace.Build(); 
-        palace.Save(); 
+        palace.init(); 
+        palace.persist(); 
 
         document.querySelectorAll('[active="true"]').forEach(room => {
             room.setAttribute('active', 'false'); 
         }); 
 
-        document.querySelectorAll('div.memory').forEach(mem => {
-            mem.remove(); 
+        document.querySelectorAll('.locus').forEach(dom_locus => {
+            dom_locus.remove(); 
         }); 
 
-        rem_all_room_mem(); 
+        dom_rem_room_loci(); 
     })
     
     /* 
     * 
     * 
-    * ADD MEMORY STUFF
+    * ADD LOCUS STUFF
     * 
     * 
     */
 
-    // MEMORY INTERFACE VISIBILITY
+    // PUSH LOCUS INTERFACE VISIBILITY
     
-    const addMemoryInterface = document.querySelector('.add-memory-interface'); 
-    document.querySelector('.add-memory').addEventListener('click', () => addMemoryInterface.style.display = 'block'); 
+    const dom_push_locus = document.querySelector('.push-locus'); 
+    document.querySelector('.mode-push-locus').addEventListener('click', () => dom_push_locus.style.display = 'block'); 
 
-    const res_add_mem_inf = () => {
-        addMemoryInterface.querySelector('.assertion-interface').innerText = 'TYPE HERE'
-        addMemoryInterface.querySelector('.association-interface').innerText = 'TYPE HERE'
-        addMemoryInterface.style.display = 'none'; 
+    const reset_dom_push_locus = () => {
+        dom_push_locus.querySelector('.memory-candidate').innerText = 'TYPE HERE'
+        dom_push_locus.querySelector('.association-candidate').innerText = 'TYPE HERE'
+        dom_push_locus.style.display = 'none'; 
     }; 
-    document.querySelector('.close-add-memory-interface').addEventListener('click', res_add_mem_inf); 
+    document.querySelector('.push-locus .close').addEventListener('click', reset_dom_push_locus); 
 
-    // SUBMIT A NEW MEMORY FROM THE POP-UP INTERFACE
+    // SUBMIT A NEW LOCUS FROM THE POP-UP INTERFACE
     
-    document.querySelector('.add-memory-submit').addEventListener('click', async () => {
+    document.querySelector('.push-locus .push').addEventListener('click', async () => {
 
         // CHECK
-        
-        const ent_assoc = document.querySelector('.association-interface').innerText; 
-        const assertion = addMemoryInterface.querySelector('.assertion-interface').innerText; 
-        if(!ent_assoc || ent_assoc === '' || ent_assoc === 'TYPE HERE') {
+
+        const association_candidate = document.querySelector('.association-candidate').innerText; 
+        const memory_candidate = dom_push_locus.querySelector('.memory-candidate').innerText; 
+        if(!association_candidate || association_candidate === '' || association_candidate === 'TYPE HERE') {
             console.error('SUBMITTED — ABANDONED BECAUSE THE ASSOCIATION WAS EMPTY'); 
             return; 
         }
-        console.log('POSTING…', ent_assoc); 
+        console.log('POSTING…', association_candidate); 
 
         // SEND API REQUEST FOR AI IMAGE
         
@@ -313,13 +313,13 @@ window.addEventListener('DOMContentLoaded', async () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ desc: ent_assoc }),
+          body: JSON.stringify({ desc: association_candidate }),
         });
         const data = await response.json();
         
         // RESET THE ADD MEMORY INTERFACE
 
-        res_add_mem_inf(); 
+        reset_dom_push_locus(); 
         
         // GO AHEAD AND ADD A MEMORY
         
@@ -329,35 +329,35 @@ window.addEventListener('DOMContentLoaded', async () => {
             // DEV / PROD TOGGLE
             // : PREAMBLE
             
-            // const fetchedImg = process.env.NODE_ENV === 'development' ? await fetch(data.result) : await fetch(`data:image/png;base64,${data}`); 
+            const mnemonic_fetched = process.env.NODE_ENV === 'development' ? await fetch(data.result) : await fetch(`data:image/png;base64,${data}`); 
 
             // MANUALLY USE PREAMBLE
             
-            const fetchedImg = await fetch(`data:image/png;base64,${data}`); 
+            // const mnemonic_fetched = await fetch(`data:image/png;base64,${data}`); 
             
-            const blobImg = await fetchedImg.blob(); 
-            const fileImg = new File([blobImg], 'img.png', { type: blobImg.type }); 
+            const mnemonic_blob = await mnemonic_fetched.blob(); 
+            const mnemonic_file = new File([mnemonic_blob], 'img.png', { type: mnemonic_blob.type }); 
 
             let id = -1; 
-            if(fileImg) {
-                id = await palace.addMemory(fileImg); 
+            if(mnemonic_file) {
+                id = await palace.push_locus(mnemonic_file); 
             }
             
-            // IF WE'VE ADDED A MEMORY TO THE PALACE IN MEMORY
+            // IF WE'VE ADDED A LOCUS TO THE PALACE
             
             if(id !== -1) {
 
                 // ADD AN ASSERTION IF IT'S THERE
 
-                if(assertion && assertion !== '' && assertion !== 'TYPE HERE') {
-                    palace.set_mem_assertion(id, assertion); 
+                if(memory_candidate && memory_candidate !== '' && memory_candidate !== 'TYPE HERE') {
+                    palace.set_locus_memory(id, memory_candidate); 
                 }
 
                 // ADD TO THE DOM
                 // ADD TO THE STORAGE
                 
-                AddMemory(palace.Memories.find(mem => mem.id === id)); 
-                palace.Save(); 
+                push_dom_locus(palace.loci.find(locus => locus.id === id)); 
+                palace.persist(); 
             }
     
         }
@@ -365,26 +365,27 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // MANUALLY UPLOAD FILE
 
-    const manualInput = document.querySelector('.add-manual-file-interface'); 
-    manualInput.addEventListener('change', async change => {
-        const assertion = addMemoryInterface.querySelector('.assertion-interface').innerText; 
+    const dom_mnemonic_candidate = document.querySelector('.mnemonic-candidate'); 
+    dom_mnemonic_candidate.addEventListener('change', async () => {
+        const memory = document.querySelector('.memory-candidate').innerText; 
         
-        const file = manualInput.files[0]; 
+        const file = dom_mnemonic_candidate.files[0]; 
         let id = -1; 
         if(file) {
-            id = await palace.addMemory(file); 
+            id = await palace.push_locus(file); 
         }
         
         if(id !== -1) {
 
             // ADD AN ASSERTION IF IT EXISTS
 
-            if(assertion && assertion !== '' && assertion !== 'TYPE HERE') {
-                palace.set_mem_assertion(id, assertion); 
+            if(memory && memory !== '' && memory !== 'TYPE HERE') {
+                palace.set_locus_memory(id, memory); 
             }
             
-            AddMemory(palace.Memories.find(mem => mem.id === id)); 
-            palace.Save(); 
+            push_dom_locus(palace.loci.find(locus => locus.id === id)); 
+            palace.persist(); 
+            reset_dom_push_locus(); 
         }
     }); 
 

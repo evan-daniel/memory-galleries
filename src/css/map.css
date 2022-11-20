@@ -11,7 +11,7 @@ body {
 
 /* SCHEMATIC CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
 
-.schematic {
+.edit-palace {
     display: flex; 
 }
 
@@ -27,7 +27,7 @@ body {
 
 /* MAP */
 
-.floor-plan {
+.map {
     flex: 1 0 100vmin; 
     width: 100vmin; 
     height: 100vmin; 
@@ -83,7 +83,7 @@ body {
 
 /* MEMORIES */
 
-.memories {
+.loci {
     overflow: scroll; 
     flex: 1 1 100%; 
     
@@ -94,7 +94,7 @@ body {
     align-content: flex-start; 
 }
 
-.memory {
+.locus {
     position: relative; 
     flex: 0 1 33.33%; 
     height: 33%; 
@@ -108,11 +108,11 @@ body {
     justify-content: center;
     align-items: center;
 }
-.memory[being-dragged = "true"] {
+.locus[being-dragged = "true"] {
     opacity: 0.66; 
 }
 
-.memory-img {
+.mnemonic {
     position: absolute; 
     top: 0; 
     right: 0; 
@@ -120,7 +120,7 @@ body {
     left: 0; 
 }
 
-.assertion {
+.memory {
     position: absolute; 
     right: 0; 
     bottom: 0; 
@@ -134,8 +134,8 @@ body {
     align-items: center;
 }
 
-.download-memory, 
-.erase-memory {
+.locus .download, 
+.locus .erase {
     position: absolute; 
     top: 0; 
     left: 0; 
@@ -155,14 +155,14 @@ body {
     align-items: center;
 }
 
-.download-memory {
+.locus .download {
     left: unset; 
     right: 0; 
 }
 
 /* ADD MEMORY INTERFACE */
 
-.add-memory-interface {
+.push-locus {
     z-index: 100; 
     position: absolute; 
 
