@@ -12,9 +12,6 @@ const dev_grid = () => {
         
         const cell = document.createElement('div'); 
         cell.classList.add('dev-grid-cell'); 
-        // cell.setAttribute('', Math.floor(i / 32) % 2 === 0 ? 'false' : 'true'); 
-        cell.setAttribute('data-column', `${i % 32}`); 
-        cell.setAttribute('data-row', `${Math.floor(i / 32) % 32}`); 
         grid.appendChild(cell); 
     }
 }; 

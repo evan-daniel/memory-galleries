@@ -96,7 +96,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if(
     process.env.NODE_ENV === 'development' 
-    // && false
+    && false
   ) {
     dev_grid(); 
   }

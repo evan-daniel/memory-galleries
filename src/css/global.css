@@ -4,9 +4,10 @@
 :root {
     box-sizing: border-box; 
     
-    --rvw: 1vw; 
-    --rvh: 1vh; 
-    font-size: calc(0.83333 * 3.125 * var(--rvw)); 
+    --vw: 1vw; 
+    --vh: 1vh; 
+    --vmin: 1vmin; 
+    font-size: calc(0.83333 * 3.125 * var(--vmin)); 
 }
 
 *, 
@@ -43,26 +44,31 @@ img {
     bottom: 0; 
     left: 0; 
     
-    /* background-color: #0ff4; */
-
     display: flex; 
     flex-wrap: wrap;
     align-content: flex-start;
 }
 
+/* GRID CELLS */
+
 .dev-grid-cell {
-    width: calc(var(--rvw) * 3.125); 
-    height: calc(var(--rvw) * 3.125); 
+    width: calc(var(--vmin) * 3.125); 
+    height: calc(var(--vmin) * 3.125); 
 
     border-bottom: 1px solid #00f2; 
     border-right: 1px solid #00f2; 
 }
 
+/* GRID CELL LINES */
+
 .dev-grid-cell[data-column = "7"], 
 .dev-grid-cell[data-column = "15"], 
-.dev-grid-cell[data-column = "23"]
-{
+.dev-grid-cell[data-column = "23"] {
     border-right: 1px solid #00f6; 
+}
+
+.dev-grid-cell[data-column = "31"] {
+    border-right: 2px solid #00fc; 
 }
 
 .dev-grid-cell[data-row = "7"], 
