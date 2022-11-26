@@ -22,7 +22,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // SAVE NO MATTER WHAT
 
     const palace_data_buf = JSON.parse(localStorage.getItem(palaces.active)); 
-    if(palace_data_buf) {
+    if(palace_data_buf) { 
         console.log('PALACE DATA', palace_data_buf); 
         await palace.wrangle(palace_data_buf); 
     }

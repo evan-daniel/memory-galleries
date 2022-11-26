@@ -1,7 +1,12 @@
+import global from './global.js';
+import dev_grid from './dev-grid.js'; 
+
 import '../css/global.css'; 
 import '../css/home.css'; 
 
 window.addEventListener('DOMContentLoaded', () => {
+
+  global(); 
 
   // GET PALACES
   // OR CREATE
@@ -11,12 +16,19 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log('SAVING PALACES', palaces); 
     localStorage.setItem('palaces', JSON.stringify(palaces)); 
   }; 
+
+  // IF THERE IS NO PALACES OBJECT STORED IN LOCALSTORAGE
+  // OR IF THERE ARE NO PALACES STORED IN THE LOCALSTORAGE OBJECT
+  
   if(!palaces || Object.keys(palaces).length === 0) {
     palaces = {
       active: '', 
       keys: [], 
     }; 
+
+    // document.querySelector('.palaces-interface').setAttribute()
   }
+
   save_palaces(); 
   
   // LIST PALACES
@@ -79,5 +91,14 @@ window.addEventListener('DOMContentLoaded', () => {
     save_palaces(); 
     window.location = '/map'; 
   }; 
+
+  // DEV GRID
+
+  if(
+    process.env.NODE_ENV === 'development' 
+    // && false
+  ) {
+    dev_grid(); 
+  }
 
 }); 

@@ -1,5 +1,12 @@
+
+/* GENERAL */
+
 :root {
     box-sizing: border-box; 
+    
+    --rvw: 1vw; 
+    --rvh: 1vh; 
+    font-size: calc(0.83333 * 3.125 * var(--rvw)); 
 }
 
 *, 
@@ -13,6 +20,11 @@
     background-position: center; 
 }
 
+body {
+    line-height: 1.2; 
+    font-family: sans-serif; 
+}
+
 a {
     text-decoration: none;
     color: #000; 
@@ -20,4 +32,45 @@ a {
 
 img {
     display: block; 
+}
+
+/* DEV GRID */
+
+.dev-grid {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0; 
+    
+    /* background-color: #0ff4; */
+
+    display: flex; 
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.dev-grid-cell {
+    width: calc(var(--rvw) * 3.125); 
+    height: calc(var(--rvw) * 3.125); 
+
+    border-bottom: 1px solid #00f2; 
+    border-right: 1px solid #00f2; 
+}
+
+.dev-grid-cell[data-column = "7"], 
+.dev-grid-cell[data-column = "15"], 
+.dev-grid-cell[data-column = "23"]
+{
+    border-right: 1px solid #00f6; 
+}
+
+.dev-grid-cell[data-row = "7"], 
+.dev-grid-cell[data-row = "15"], 
+.dev-grid-cell[data-row = "23"] {
+    border-bottom: 1px solid #00f6; 
+}
+
+.dev-grid-cell[data-row = "31"] {
+    border-bottom: 2px solid #00fc; 
 }

@@ -1,18 +1,53 @@
-* {
-    color: #f00; 
+/* GLOBAL */
+
+body {
+    font-family: sans-serif; 
+    font-size: 2rem; 
 }
 
-/* TITLE */
-
-.title {
-    height: 200px; 
-    width: 200px; 
+.text-holder {
+    font-size: 1rem; 
+    line-height: 1.2rem; 
+    position: absolute; 
+    top: 0; 
     
-    background-color: #aaf; 
-    background-image: URL('../img/bernard_bosanquet.png'); 
+    background-color: #0002;
 }
 
-/* PALACES */
+/* HERO */
+
+.hero {
+    font-size: 4rem; 
+    font-weight: 900; 
+}
+
+/* PALACES INTERFACE */
+
+.palaces-interface {
+    
+}
+
+/* MODE: NEW USER  */
+
+.palaces-interface .mode-user-new {
+    display: none; 
+}
+
+.palaces-interface[user-mode = "new"] .mode-user-new {
+    display: block; 
+}
+
+/* MODE: RETURNING USER  */
+
+.palaces-interface .mode-user-returning {
+    display: none; 
+}
+
+.palaces-interface[user-mode = "returning"] .mode-user-returning {
+    display: block; 
+}
+
+/* PALACE */
 
 .palace {
     height: 8rem; 

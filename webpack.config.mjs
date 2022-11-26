@@ -14,7 +14,8 @@ export default {
     static: './public',
     proxy: { 
       '/api': `http://localhost:3000`, 
-    }
+    }, 
+    watchFiles: ['./src/html/*'], 
   },
   devtool: 'inline-source-map', 
   output: {
