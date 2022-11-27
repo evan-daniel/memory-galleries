@@ -19,6 +19,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "@material-design-icons/svg": "^0.14.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",

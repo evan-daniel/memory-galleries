@@ -23,7 +23,7 @@
 
 body {
     line-height: 1.2; 
-    font-family: sans-serif; 
+    font-family: 'Share Tech', sans-serif; 
 }
 
 a {
@@ -33,6 +33,21 @@ a {
 
 img {
     display: block; 
+    object-fit: contain;
+    object-position: center;
+}
+
+/* MATERIAL ICONS */
+
+.material-icons.theme-color {
+    color: #f0f; 
+}
+
+.my-class {
+    height: 200px; 
+    width: 200px; 
+    background-color: #0002; 
+
 }
 
 /* DEV GRID */

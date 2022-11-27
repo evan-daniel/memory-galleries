@@ -4,6 +4,8 @@ import dev_grid from './dev-grid.js';
 import '../css/global.css'; 
 import '../css/home.css'; 
 
+import Face from '@material-design-icons/svg/filled/face.svg';
+
 window.addEventListener('DOMContentLoaded', () => {
 
   global(); 
@@ -101,4 +103,5 @@ window.addEventListener('DOMContentLoaded', () => {
     dev_grid(); 
   }
 
+  document.querySelector('.put-icon-here').style.backgroundImage = `URL("${Face}")`; 
 }); 

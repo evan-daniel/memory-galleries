@@ -11,7 +11,7 @@ export default {
     game: './src/js/game.js', 
   }, 
   devServer: {
-    static: './public',
+    static: './docs',
     proxy: { 
       '/api': `http://localhost:3000`, 
     }, 
@@ -44,8 +44,8 @@ export default {
     new HtmlWebpackPlugin({
       template: './src/html/map.html',
       inject: true,
-      chunks: ['map'],
-      filename: 'map/index.html', 
+      chunks: ['tutorial'],
+      filename: 'tutorial/index.html', 
     }),
     new HtmlWebpackPlugin({
       template: './src/html/game.html',

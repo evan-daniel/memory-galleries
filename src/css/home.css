@@ -71,3 +71,13 @@ body {
     justify-content: center; 
     align-items: center;
 }
+
+/* TEST */
+
+.put-icon-here {
+    height: 12rem; 
+    width: 12rem; 
+    background-color: #0002;
+    background-image: url('../img/bernard_bosanquet.png');
+    border-radius: 6rem; 
+}
