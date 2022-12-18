@@ -7,22 +7,33 @@ import Palace from './Palace.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    // GET PALACES FROM LOCAL STORAGE
+    // GET PERSISTED DATA
     
+    // GET PALACES FROM LOCAL STORAGE
+
     const palaces = JSON.parse(localStorage.getItem('palaces')); 
-    if(!palaces || !palaces.active) {
+    if(!palaces || !palaces.active) { 
         window.location = '/'; 
     }
-
-    // INSTANTIATE
     
-    const palace = new Palace(palaces.active); 
+    // INSTANTIATE PALACE
+    
+    let palace = new Palace(palaces.active); 
     await palace.init(); 
+    document.documentElement.style.setProperty('--rooms-per-side', `${palace.rooms_per_side}`); 
     
+    // LOAD LOCALSTORAGE DATA IF IT EXISTS
+    // SAVE NO MATTER WHAT
+
     const palace_data_buf = JSON.parse(localStorage.getItem(palaces.active)); 
     if(palace_data_buf) {
+        console.log('PALACE DATA', palace_data_buf); 
         await palace.wrangle(palace_data_buf); 
     }
+    console.log('PALACE AFTER INIT', palace); 
+    palace.persist(); 
+    
+    // GAME GLOBAL VARIABLES
     
     const wall_width = 10; 
     const wall_height = 5; 
@@ -33,8 +44,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }; 
 
     const dom_candidate_answer = document.querySelector('.candidate-answer'); 
-    
-    console.log('PALACE', palace); 
     
     // INIT
     
@@ -95,7 +104,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const mesh_wall = wall_template.clone(); 
                 mesh_wall.position.set(x * wall_width, wall_height / 2, y * wall_width); 
                 scene.add(mesh_wall); 
-
             }
 
             // LOCI

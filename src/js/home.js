@@ -5,6 +5,8 @@ import '../css/global.css';
 import '../css/home.css'; 
 
 import Face from '@material-design-icons/svg/filled/face.svg';
+// Face isn't being found.  
+// Which is odd because it was being found yesterday.  
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -83,6 +85,7 @@ window.addEventListener('DOMContentLoaded', () => {
       palaces.active = ''; 
     }
     save_palaces(); 
+    localStorage.removeItem(pal_key); 
   }; 
 
   // REDIRECT FROM PALACE

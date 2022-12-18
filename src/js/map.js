@@ -1,3 +1,9 @@
+// SETTINGS
+
+const use_api_in_dev = true; 
+
+// IMPORT
+
 import '../css/global.css'; 
 import '../css/map.css'; 
 
@@ -8,7 +14,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // GET PALACES FROM LOCAL STORAGE
     
     const palaces = JSON.parse(localStorage.getItem('palaces')); 
-    if(!palaces || !palaces.active) {
+    if(!palaces || !palaces.active) { 
         window.location = '/'; 
     }
     
@@ -22,7 +28,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // SAVE NO MATTER WHAT
 
     const palace_data_buf = JSON.parse(localStorage.getItem(palaces.active)); 
-    if(palace_data_buf) { 
+    if(palace_data_buf) {
         console.log('PALACE DATA', palace_data_buf); 
         await palace.wrangle(palace_data_buf); 
     }
@@ -170,7 +176,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         // SEARCH FOR ALL ROOMS WITH THE LOCUS AND DECOUPLE
 
-        document.querySelectorAll(`.room[locus = "${id}"]`).forEach(room => dom_rem_room_locus(room)); 
+        document.querySelectorAll(`.room[locus = "${id}"]`).forEach(room => remove_room_locus(room)); 
     }; 
     
     /* 
@@ -191,7 +197,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             // IF USER CLICKS ON A ROOM WITH A LOCUS, DECOUPLE
             
             if(room.getAttribute('locus') !== '-1' || room.style.backgroundImage) {
-                dom_rem_room_locus(room); 
+                remove_room_locus(room); 
                 palace.rooms[+room.getAttribute('row')][+room.getAttribute('column')].locus = -1; 
                 palace.persist(); 
                 return; 
@@ -246,11 +252,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // REMOVE MEMORIES FROM ROOMS
     
-    const dom_rem_room_locus = target => {
+    const remove_room_locus = target => {
+        palace.remove_locus_from_all_rooms(+target.getAttribute('locus')); 
+        
         target.setAttribute('locus', '-1'); 
         target.style.backgroundImage = ''; 
     }
-    const dom_rem_room_loci = () => document.querySelectorAll('.room:not([locus = "-1"])').forEach(dom_room => dom_rem_room_locus(dom_room)); 
+    const remove_room_loci = () => document.querySelectorAll('.room:not([locus = "-1"])').forEach(dom_room => remove_room_locus(dom_room)); 
     
     document.addEventListener('dragend', removeDrags); 
 
@@ -269,7 +277,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             dom_locus.remove(); 
         }); 
 
-        dom_rem_room_loci(); 
+        remove_room_loci(); 
     })
     
     /* 
@@ -326,14 +334,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         if(data) {
             console.log('SUCCEED (POSTING)', data); 
             
-            // DEV / PROD TOGGLE
-            // : PREAMBLE
+            // PREAMBLE IF USING API
             
-            const mnemonic_fetched = process.env.NODE_ENV === 'development' ? await fetch(data.result) : await fetch(`data:image/png;base64,${data}`); 
-
-            // MANUALLY USE PREAMBLE
-            
-            // const mnemonic_fetched = await fetch(`data:image/png;base64,${data}`); 
+            const preamble = use_api_in_dev || process.env.NODE_ENV !== 'development' ? 'data:image/png;base64,' : ''; 
+            const mnemonic_fetched = await fetch(`${preamble}${data}`); 
             
             const mnemonic_blob = await mnemonic_fetched.blob(); 
             const mnemonic_file = new File([mnemonic_blob], 'img.png', { type: mnemonic_blob.type }); 

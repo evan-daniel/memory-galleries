@@ -9,10 +9,16 @@ body {
     left: 0; 
 }
 
-/* SCHEMATIC CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
+/* CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
 
 .edit-palace {
     display: flex; 
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+    .edit-palace {
+        flex-direction: column;
+    }
 }
 
 /* INTERFACE */
@@ -21,8 +27,8 @@ body {
     position: relative; 
     flex: 0 1 100%; 
     
-    display: flex; 
-    flex-direction: column; 
+    /* display: flex;  */
+    /* flex-direction: column;  */
 }
 
 /* MAP */
@@ -86,6 +92,7 @@ body {
 .loci {
     overflow: scroll; 
     flex: 1 1 100%; 
+    /* height: 200px;  */
     
     background-color: #aaa; 
 
@@ -97,7 +104,7 @@ body {
 .locus {
     position: relative; 
     flex: 0 1 33.33%; 
-    height: 33%; 
+    height: 200px; 
 
     background-color: #888; 
     

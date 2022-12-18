@@ -46,12 +46,12 @@ class Palace {
             return; 
         }
 
-        console.log('LOADING…', palace); 
+        console.log('WRANGLING…', palace); 
 
-        for(let i = 0; i < this.rooms_per_side; ++i) {
-            this.rooms[i] = palace.rooms[i]; 
-        }
+        this.loci_cursor = palace.loci_cursor; 
 
+        // ITERATE THROUGH THROUGH LOCI AND DISCARD THOSE WITH BAD FILE REFERENCES
+        
         for(let i = 0; i < palace.loci.length; ++i) {
             const locus_from_storage = palace.loci[i]; 
             if(locus_from_storage.id !== undefined && locus_from_storage.extension && locus_from_storage.filename) {
@@ -62,11 +62,26 @@ class Palace {
                     memory: locus_from_storage.memory, 
                 }; 
                 locus_buffer.handle = await this.storage.mnemonics.getFileHandle(`${locus_buffer.filename}`); 
-                this.loci.push(locus_buffer); 
+
+                if(locus_buffer.handle) {
+                    this.loci.push(locus_buffer); 
+                }
             }
         }; 
-        this.loci_cursor = palace.loci_cursor; 
 
+        // ITERATE THROUGH ROOMS AND DISCARD BAD LOCI REFERENCES
+        
+        for(let y = 0; y < this.rooms_per_side; ++y) {
+            for(let x = 0; x < this.rooms_per_side; ++x) {
+                this.rooms[y][x] = palace.rooms[y][x]; 
+
+                if(this.rooms[y][x].locus !== -1) {
+                    if(this.locus_idx(this.rooms[y][x].locus) === -1) {
+                        this.rooms[y][x].locus = -1; 
+                    }
+                }
+            }
+        }
     }
 
     async push_locus(file) {
@@ -129,6 +144,13 @@ class Palace {
 
     locus_idx(id) {
         return this.loci.findIndex(locus => locus.id === id); 
+    }
+
+    remove_locus_from_all_rooms(id) {
+        id = +id; 
+        this.rooms.filter(room => room.locus === id).forEach(room => {
+            room.locus = -1; 
+        }); 
     }
 
     // INIT IS NECESSARY FOR OPFS

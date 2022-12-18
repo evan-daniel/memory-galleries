@@ -44,8 +44,8 @@ export default {
     new HtmlWebpackPlugin({
       template: './src/html/map.html',
       inject: true,
-      chunks: ['tutorial'],
-      filename: 'tutorial/index.html', 
+      chunks: ['map'],
+      filename: 'map/index.html', 
     }),
     new HtmlWebpackPlugin({
       template: './src/html/game.html',
