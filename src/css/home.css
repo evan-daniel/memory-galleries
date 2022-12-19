@@ -1,8 +1,21 @@
+/* FLEX CENTER */
+
+.banner-instruction-img, 
+.banner-instruction-copy, 
+.brand-first-word-letter, 
+.brand-first-word, 
+.brand-second-word, 
+.subtitle, 
+.brand {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
 /* GLOBAL */
 
 body {
-    font-family: sans-serif; 
-    font-size: 2rem; 
+    font-size: 1rem; 
 }
 
 .text-holder {
@@ -14,11 +27,144 @@ body {
     background-color: #0002;
 }
 
+/* INTRODUCTION SECTION */
+
+.introduction {
+    max-width: calc(100 * var(--vw)); 
+    overflow: hidden;
+
+    display: flex; 
+    flex-direction: row;
+}
+
+.introduction-content {
+    height: calc(100 * var(--vh)); 
+    width: calc(100 * var(--vmin)); 
+}
+
+/* BRAND */
+
+.brand {
+    height: calc(8 * var(--c)); 
+    width: calc(100 * var(--vmin)); 
+    
+    background-color: #777; 
+    color: #fff; 
+    font-weight: 900; 
+
+    line-height: 1;
+
+    justify-content: flex-start;
+}
+
+.brand-second-word, 
+.brand-first-word {
+    height: calc(8 * var(--c)); 
+    width: calc(8 * var(--c)); 
+}
+
+.brand-first-word {
+    font-size: 4rem; 
+    font-family: var(--rm); 
+
+    display: flex; 
+    flex-wrap: wrap;
+}
+
+.brand-first-word-letter {
+    flex: 1 1 50%; 
+    height: calc(4 * var(--c)); 
+    
+    align-items: flex-end;
+}
+
+.brand-first-word-letter:nth-of-type(1), 
+.brand-first-word-letter:nth-of-type(4) {
+    background-color: #0f08; 
+}
+
+.brand-second-word {
+    font-size: 6rem; 
+    font-family: var(--tt); 
+    background-color: #0f08; 
+}
+
+.tagline {
+    flex: 1 0 auto; 
+    padding: var(--c); 
+
+    font-family: var(--rm); 
+
+    display: flex; 
+    align-items: flex-end; 
+}
+
 /* HERO */
 
-.hero {
-    font-size: 4rem; 
-    font-weight: 900; 
+.hero-img {
+    z-index: 100; 
+    flex: 1 0 auto; 
+    height: calc(100 * var(--vmin)); 
+
+    box-shadow: 0 0 calc(4 * var(--c)) #0008; 
+
+    background-color: #f0f; 
+}
+
+.banner-instruction {
+    position: relative; 
+    height: calc(8 * var(--c)); 
+    padding: 0; 
+
+    display: flex; 
+    justify-content: flex-end;
+    align-items: center; 
+}
+
+.banner-instruction:nth-of-type(2) {
+    /* flex-direction: row-reverse;  */
+}
+
+.banner-instruction-copy {
+    flex: 1 0 50%; 
+    
+    /* background-color: #00f4; */
+}    
+
+.banner-instruction-img {
+    flex: 0 0 calc(7 * var(--c)); 
+    height: calc(7 * var(--c)); 
+    
+    font-family: var(--tt); 
+    text-align: center;
+    background-color: #0f04; 
+} 
+
+.banner-instruction:nth-of-type(3) .banner-instruction-img {
+    flex: 0 0 calc(14 * var(--c)); 
+}
+
+.banner-instruction-img:nth-last-child(2) {
+    margin-left: var(--c); 
+}    
+
+.banner-instruction-img:nth-last-child(1) {
+    margin-right: var(--c); 
+} 
+
+.banner-instruction:nth-of-type(3) .banner-instruction-img:nth-last-child(1) {
+    margin-left: var(--c); 
+}
+
+.banner-instruction-arrow {
+    position: absolute; 
+    right: calc(7 * var(--c)); 
+    height: calc(2 * var(--c)); 
+    width: calc(2 * var(--c)); 
+
+    background-color: #fff;
+
+    border-radius: calc(2 * var(--c)); 
 }
 
 /* PALACES INTERFACE */
@@ -70,14 +216,4 @@ body {
     display: flex; 
     justify-content: center; 
     align-items: center;
-}
-
-/* TEST */
-
-.put-icon-here {
-    height: 12rem; 
-    width: 12rem; 
-    background-color: #0002;
-    background-image: url('../img/bernard_bosanquet.png');
-    border-radius: 6rem; 
 }

@@ -7,6 +7,8 @@ YUJI SYUKU
 
 */
 
+@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono&family=Cinzel:wght@400&display=swap');
+
 
 /* GENERAL */
 
@@ -16,7 +18,11 @@ YUJI SYUKU
     --vw: 1vw; 
     --vh: 1vh; 
     --vmin: 1vmin; 
+    --c: calc(3.125 * var(--vmin)); 
     font-size: calc(0.83333 * 3.125 * var(--vmin)); 
+
+    --rm: 'Cinzel', 'Trajan', 'Garamond', 'Times New Roman', sans-serif; 
+    --tt: 'Chivo Mono', monospace; 
 }
 
 *, 
@@ -32,7 +38,7 @@ YUJI SYUKU
 
 body {
     line-height: 1.2; 
-    font-family: 'Share Tech', sans-serif; 
+    font-family: var(--rm); 
 }
 
 a {
@@ -71,36 +77,57 @@ img {
     display: flex; 
     flex-wrap: wrap;
     align-content: flex-start;
+
+    --grid-atomic-color: 1px solid #00f1; 
+    --grid-major-color: 1px solid #00f5; 
+    --grid-inner-frame: 1px solid #00f3; 
+    --grid-vmax: 2px solid #00f; 
 }
 
 /* GRID CELLS */
 
 .dev-grid-cell {
-    width: calc(var(--vmin) * 3.125); 
-    height: calc(var(--vmin) * 3.125); 
+    width: var(--c); 
+    height: var(--c); 
 
-    border-bottom: 1px solid #00f2; 
-    border-right: 1px solid #00f2; 
+    border-bottom: var(--grid-atomic-color); 
+    border-right: var(--grid-atomic-color); 
 }
 
-/* GRID CELL LINES */
+/* VERTICAL */
+
+/* MAJOR */
 
 .dev-grid-cell[data-column = "7"], 
 .dev-grid-cell[data-column = "15"], 
 .dev-grid-cell[data-column = "23"] {
-    border-right: 1px solid #00f6; 
-}
-
-.dev-grid-cell[data-column = "31"] {
-    border-right: 2px solid #00fc; 
+    border-right: var(--grid-major-color); 
 }
 
 .dev-grid-cell[data-row = "7"], 
 .dev-grid-cell[data-row = "15"], 
 .dev-grid-cell[data-row = "23"] {
-    border-bottom: 1px solid #00f6; 
+    border-bottom: var(--grid-major-color); 
+}
+
+/* MAJOR INNER FRAME */
+
+.dev-grid-cell[inner-frame-vertical = "true"] {
+    border-right: var(--grid-inner-frame); 
+}
+
+.dev-grid-cell[inner-frame-horizontal = "true"] {
+    border-bottom: var(--grid-inner-frame); 
+}
+
+/* VMAX */
+
+.dev-grid-cell[data-column = "31"] {
+    border-right: var(--grid-vmax); 
 }
 
 .dev-grid-cell[data-row = "31"] {
-    border-bottom: 2px solid #00fc; 
+    border-bottom: var(--grid-vmax); 
 }
+
+

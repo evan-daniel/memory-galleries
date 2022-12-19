@@ -1,14 +1,29 @@
 import global from './global.js';
-import dev_grid from './dev-grid.js'; 
 
 import '../css/global.css'; 
 import '../css/home.css'; 
 
-import Face from '@material-design-icons/svg/filled/face.svg';
-// Face isn't being found.  
-// Which is odd because it was being found yesterday.  
+// IMAGES
+
+import hero_img from '../img/sample_hero.png'; 
+import mnemonic_img from '../img/bernard_bosanquet.png'; 
+import instruction_place from '../img/instruction-place.png'; 
+import instruction_building from '../img/instruction-building.png'; 
+import instruction_test from '../img/instruction-test.png'; 
+
+import instruction_arrow from '@material-design-icons/svg/outlined/arrow_circle_right.svg'; 
 
 window.addEventListener('DOMContentLoaded', () => {
+
+  // IMAGES
+
+  document.querySelector('.hero-img').style.backgroundImage = `URL("${hero_img}")`; 
+  document.querySelector('[img = "instruction-mnemonic"]').style.backgroundImage = `URL("${mnemonic_img}")`; 
+  document.querySelector('[img = "instruction-place"]').style.backgroundImage = `URL("${instruction_place}")`; 
+  document.querySelector('[img = "instruction-building"]').style.backgroundImage = `URL("${instruction_building}")`; 
+  document.querySelector('[img = "instruction-test"]').style.backgroundImage = `URL("${instruction_test}")`; 
+
+  document.querySelectorAll('[img = "instruction-arrow"]').forEach(ia => ia.style.backgroundImage = `URL("${instruction_arrow}")`); 
 
   global(); 
 
@@ -97,14 +112,4 @@ window.addEventListener('DOMContentLoaded', () => {
     window.location = '/map'; 
   }; 
 
-  // DEV GRID
-
-  if(
-    process.env.NODE_ENV === 'development' 
-    && false
-  ) {
-    dev_grid(); 
-  }
-
-  document.querySelector('.put-icon-here').style.backgroundImage = `URL("${Face}")`; 
 }); 
