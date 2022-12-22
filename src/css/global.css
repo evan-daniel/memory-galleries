@@ -15,14 +15,32 @@ YUJI SYUKU
 :root {
     box-sizing: border-box; 
     
+    /* VARIABLES */
+    
+    /* SIZING */
+    
     --vw: 1vw; 
     --vh: 1vh; 
     --vmin: 1vmin; 
     --c: calc(3.125 * var(--vmin)); 
     font-size: calc(0.83333 * 3.125 * var(--vmin)); 
 
+    /* FONTS */
+    
     --rm: 'Cinzel', 'Trajan', 'Garamond', 'Times New Roman', sans-serif; 
     --tt: 'Chivo Mono', monospace; 
+
+    /* COLOR */
+    
+    --theme-color: #38C038; 
+    --theme-color-transparent: #38C03800; 
+    --theme-color-negative: #777; 
+
+    /* DECORATION */
+
+    --skeuomorphic-shadow: 0 0 calc(2 * var(--c)) #0004;  
+    --skeuomorphic-shadow-border: 2px solid #aaa; 
+
 }
 
 *, 

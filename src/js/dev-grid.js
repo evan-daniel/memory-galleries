@@ -8,7 +8,7 @@ const dev_grid = () => {
     document.body.appendChild(grid); 
     console.log(grid.clientWidth)
 
-    for(let i = 0; i < 4096; ++i) {
+    for(let i = 0; i < 8192; ++i) {
         
         const cell = document.createElement('div'); 
         cell.classList.add('dev-grid-cell'); 

@@ -45,7 +45,7 @@
                 <div class="banner">
                     <div class="banner-instruction">
                         <div class="banner-instruction-copy">
-                            Create a Visual Mnemonic 
+                            1. Create a Visual Mnemonic 
                         </div>
 
                         <div class="banner-instruction-arrow" img="instruction-arrow"></div>
@@ -53,13 +53,11 @@
                             "Bernard Bosanquet"
                         </div>
                         <div class="banner-instruction-img" img="instruction-mnemonic"></div>
-                        
-                        <!-- Create a Floor Plan -->
                     </div>
                     
                     <div class="banner-instruction">
                         <div class="banner-instruction-copy">
-                            Place it in a Building
+                            2. Place it in a 3D Gallery
                         </div>
                         <div class="banner-instruction-arrow" img="instruction-arrow"></div>
                         <div class="banner-instruction-img" img="instruction-place"></div>
@@ -68,7 +66,7 @@
                     
                     <div class="banner-instruction">
                         <div class="banner-instruction-copy">
-                            Roam and Practice
+                            3. Roam and Practice
                         </div>
                         <div class="banner-instruction-img" img="instruction-test"></div>
                     </div>
@@ -83,56 +81,145 @@
 
         <!-- ALLOWS USERS TO START USING THE SITE -->
         
-        <div class="section-cta">
-            
-            <div class="palaces-interface" user-mode="new">
-    
-                <div class="mode-user-new">
-                    <div class="cta">
+        <div class="cta">
+
+            <!-- DESIGN TO GET USERS TO SIGN UP -->
+
+            <div class="cta-content">
+
+                <!-- POSITIVE INFORMATION ABOUT THE SITE -->
+                
+                <div class="benefits">
+                    <div class="benefits-headline">
                         Get Started
                     </div>
     
-                    <div>
-                        What do you want to learn?  
+                    <div class="benefits-copy">
+                        <ul>
+                            <li>
+                                It's free.  
+                            </li>
+                            <li>
+                                It doesn't require an email or name.  
+                            </li>
+                            <li>
+                                It doesn't collect or sell your data.  
+                            </li>
+                        </ul>
                     </div>
                 </div>
+
+                <!-- LIMITATIONS OF THE SITE -->
                 
-                <div class="mode-user-returning">
-                    <div>
-                        Welcome Back
+                <div class="limitations">
+                    <div class="limitations-headline">
+                        Just so you know: 
                     </div>
-                </div>
-                    
-                <div>
-                    <input class="new-palace-key" placeholder="NEW PALACE NAME">
-                    <button class="new-palace-submit">SUBMIT</button>
-                </div>
-                <div class="palaces"></div>
-        
-                <template type="palace">
-                    <div class="palace">
-                        <div class="palace-key">NO NAME</div>
-                        <div class="erase-palace">×</div>
-                    </div>
-                </template>
     
+                    <div class="limitations-copy">
+                        <ul>
+                            <li>
+                                It's in Beta: there will be bugs.  
+                            </li>
+                            <li>
+                                If you're worried you might lose the images you create, you should download them.  
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALLOUT TO CREATE NEW PALACES -->
+
+            <div class="callout">
+
+                <div class="callout-card">
+                    <div class="callout-headline">
+                        Create a New Gallery
+                    </div>
+    
+                    <div class="callout-copy">
+                        The name should be one word
+                    </div>
+    
+                    <div class="callout-create">
+                        <input class="callout-create-name" placeholder="Name">
+                        <button class="callout-create-submit">SUBMIT</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- PROVIDES INFORMATIONAL BACKGROUND -->
+        <!-- PALACES THAT HAVE ALREADY BEEN CREATED -->
+        
+        <div class="palaces">
+            <div class="palaces-headline">
+                Your Galleries
+            </div>
+            <div class="palaces-list"></div>
+            
+            <template type="palace">
+                <div class="palace">
+                    <div class="palace-name">NO NAME</div>
 
-        <div class="section-background">
+                    <div class="palace-buttons">
+                        <div class="palace-start">start</div>
+                        <div class="palace-erase">erase</div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- PROVIDES INFORMATIONAL BACKGROUND -->
+        
+        <div class="background">
             <div class="background-title">
                 Background
             </div>
-
-            <div class="background-headline">
-                What is "LOCI" ? 
+            
+            <div class="background-content">
+                <div class="background-headline">
+                    What technique does this site use? 
+                </div>
+    
+                <div class="background-copy">
+                    It's called by (at least) three names: <em>The Method of Loci</em>, <em>Memory Palaces</em>, and <em>The Art of Memory</em>.  Loci refers to a particular point or place.  It goes back at least as far as Cicero, who used it to memorize speeches to the Roman senate.  
+                </div>
+    
+                <div class="background-headline">
+                    How does it work?  
+                </div>
+    
+                <div class="background-copy">
+                    This site follows the idea quite closely.  You first form a visual image that illustrates what you want to remember, place the visual image in a building, and then picture yourself walking through that building.  
+                </div>
+    
+                <div class="background-headline">
+                    Is there any research to support this technique?  
+                </div>
+    
+                <div class="background-copy">
+                    Plenty; too much to list here.  Many competitive memory contestants use the technique successfully.  Joshua Foer's book <em>Moonwalking with Einstein</em> (2011) is a great introduction.  Also of interest is the research on place cells, grid cells, and head-direction cells in the field of neuroscience.  
+                </div>
+    
+                <div class="background-headline">
+                    How does this app use artificial intelligence?  
+                </div>
+                
+                <div class="background-copy">
+                    This app uses uses the AI image generator DALL-E 2 to create images based on the description you enter.  
+                </div>
             </div>
 
-            <div class="background-headline">
-                How does this app use artificial intelligence?  
+            <div class="background-imgs">
+                <div class="background-img" img="background-history"></div>
+                <div class="background-img" img="background-research"></div>
             </div>
+        </div>
+
+        <div class="footer">
+            © 2022 Evan Daniel | contact: LOCI *at* evandaniel.com
         </div>
     </body>
 </html>

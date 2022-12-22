@@ -15,6 +15,8 @@
 /* GLOBAL */
 
 body {
+    --text-indent: calc(2 * var(--c)); 
+    
     font-size: 1rem; 
 }
 
@@ -29,6 +31,7 @@ body {
 
 /* INTRODUCTION SECTION */
 
+.cta, 
 .introduction {
     max-width: calc(100 * var(--vw)); 
     overflow: hidden;
@@ -37,9 +40,10 @@ body {
     flex-direction: row;
 }
 
+.cta-content, 
 .introduction-content {
+    flex: 0 0 calc(100 * var(--vmin)); 
     height: calc(100 * var(--vh)); 
-    width: calc(100 * var(--vmin)); 
 }
 
 /* BRAND */
@@ -48,7 +52,7 @@ body {
     height: calc(8 * var(--c)); 
     width: calc(100 * var(--vmin)); 
     
-    background-color: #777; 
+    background-color: var(--theme-color-negative); 
     color: #fff; 
     font-weight: 900; 
 
@@ -101,20 +105,23 @@ body {
 
 /* HERO */
 
+.callout,
 .hero-img {
     z-index: 100; 
-    flex: 1 0 auto; 
+    flex: 1 0 0; 
     height: calc(100 * var(--vmin)); 
 
-    box-shadow: 0 0 calc(4 * var(--c)) #0008; 
-
-    background-color: #f0f; 
+    box-shadow: var(--skeuomorphic-shadow); 
 }
+
+/* BANNER DESCRIBES THE MOST FUNDAMENTAL MECHANICS OF THE SITE */
 
 .banner-instruction {
     position: relative; 
     height: calc(8 * var(--c)); 
     padding: 0; 
+
+    /* font-family: var(--tt);  */
 
     display: flex; 
     justify-content: flex-end;
@@ -127,8 +134,11 @@ body {
 
 .banner-instruction-copy {
     flex: 1 0 50%; 
-    
+    padding: 0 var(--text-indent); 
+
     /* background-color: #00f4; */
+
+    justify-content: flex-start;
 }    
 
 .banner-instruction-img {
@@ -167,53 +177,190 @@ body {
     border-radius: calc(2 * var(--c)); 
 }
 
-/* PALACES INTERFACE */
+/* CALL TO ACTION */
 
-.palaces-interface {
+.cta {
+    height: calc(16 * var(--c)); 
+}
+
+/* CALLOUT TO CREATE NEW PALACE */
+
+.callout {
+    height: calc(16 * var(--c)); 
+
+    box-shadow: none; 
     
-}
-
-/* MODE: NEW USER  */
-
-.palaces-interface .mode-user-new {
-    display: none; 
-}
-
-.palaces-interface[user-mode = "new"] .mode-user-new {
-    display: block; 
-}
-
-/* MODE: RETURNING USER  */
-
-.palaces-interface .mode-user-returning {
-    display: none; 
-}
-
-.palaces-interface[user-mode = "returning"] .mode-user-returning {
-    display: block; 
-}
-
-/* PALACE */
-
-.palace {
-    height: 8rem; 
-    width: 8rem; 
-
-    border: 1px solid #000; 
-    border-radius: 2rem; 
-    cursor: pointer; 
-
     display: flex; 
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.erase-palace {
-    height: 2rem; 
-    width: 2rem; 
-    border: 1px solid #000; 
+.callout-card {
+    height: calc(12 * var(--c)); 
+    padding: var(--c); 
+
+    box-shadow: var(--skeuomorphic-shadow);
+    border: var(--skeuomorphic-shadow-border); 
+    
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+}
+
+/* CTA INFORMATIONAL CONTENT */
+
+/* BENEFITS AND LIMITATIONS */
+
+.cta-content {
+    height: calc(16 * var(--c)); 
+    padding: calc(4 * var(--c)) var(--text-indent); 
+}
+
+.background-copy, 
+.limitations-copy, 
+.benefits-copy {
+    font-family: var(--tt); 
+}
+
+.background-headline, 
+.limitations-headline {
+    margin: var(--c) 0 0; 
+}
+
+/* CALLOUT AND CREATE NEW PALACE */
+
+.callout {
+    
+    text-align: center; 
+}
+
+.callout-headline {
+    font-size: 2rem; 
+}
+
+.callout-copy {
+    font-size: 1rem; 
+}
+
+/* THE LIST OF PALACES */
+
+.palaces {
+    width: calc(100 * var(--vw)); 
+}
+
+.background-title, 
+.palaces-headline {
+    height: calc(8 * var(--c)); 
+    padding: var(--text-indent); 
+    
+    font-size: 2rem;    
+
+    background: linear-gradient(to bottom, #ffff 0, #fffa 50%, #ffff 100%), linear-gradient(to right, var(--theme-color) 0, var(--theme-color-negative) calc(32 * var(--c))); 
 
     display: flex; 
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.palaces-list {
+    display: flex; 
+    flex-wrap: wrap; 
+}
+
+/* AN INDIVIDUAL PALACE */
+
+.palace {
+    height: calc(12 * var(--c)); 
+    width: calc(12 * var(--c)); 
+    margin: calc(2 * var(--c)); 
+
+    border: var(--skeuomorphic-shadow-border); 
+    box-shadow: var(--skeuomorphic-shadow);
+    
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.palace-name {
+    font-size: 2rem; 
+}
+
+.palace-buttons {
+    display: flex; 
+}
+
+.palace-erase, 
+.palace-start {
+    height: calc(2 * var(--c)); 
+    width: calc(4 * var(--c)); 
+
+    font-family: var(--tt); 
+    
+    cursor: pointer; 
+    
+    display: flex; 
     justify-content: center; 
+    align-items: center;
+}
+
+.palace-start {
+    background-color: var(--theme-color);
+}
+
+.palace-erase {
+    border: 2px solid #444; 
+}
+
+/* BACKGROUND */
+
+.background {
+    background-color: none; 
+
+    display: flex; 
+    flex-wrap: wrap;
+}
+
+.background-title {
+    width: 100%; 
+}
+
+.background-content {
+    width: calc(32 * var(--c)); 
+}
+
+.background-headline {
+    padding: 0 var(--text-indent); 
+}
+
+.background-copy {
+    padding: 0 var(--text-indent); 
+}
+
+.background-imgs {
+    flex: 1 0 0; 
+}
+
+.background-img {
+    width: 100%; 
+    height: calc(16 * var(--c)); 
+
+    background-color: #f0f;
+}
+
+/* FOOTER */
+
+.footer {
+    height: calc(8 * var(--c)); 
+
+    color: #fff; 
+    font-weight: 900; 
+    background-color: var(--theme-color-negative);
+    
+    display: flex; 
+    justify-content: center;
     align-items: center;
 }
