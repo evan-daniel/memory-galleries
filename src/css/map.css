@@ -9,6 +9,71 @@ body {
     left: 0; 
 }
 
+/* HEADER */
+
+.header {
+    height: calc(8 * var(--c)); 
+    width: 100%; 
+
+    background-color: var(--theme-color-negative);
+
+    display: flex; 
+}
+
+.header-global {
+    flex: 0 0 calc(24 * var(--c)); 
+
+    display: flex; 
+}
+
+.brand {
+    position: relative; 
+    width: unset; 
+}
+
+.brand-second-word {
+    flex-direction: column;
+}
+
+.copyright {
+    font-weight: 400; 
+    font-size: 0.5rem; 
+    font-family: var(--tt); 
+    color: #fff; 
+    
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: flex-end; 
+}
+
+.header-local {
+    flex: 1 0 0; 
+
+    background-color: var(--theme-color);
+    
+    display: flex; 
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.header-local-play-button-icon {
+    height: calc(2 * var(--c)); 
+    width: calc(2 * var(--c)); 
+}
+
+.palace_title {
+    flex: 1 0 0; 
+    
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 500; 
+    color: #fff; 
+}
+
+.header-local-play-button {
+    background-color: #fff; 
+}
+
 /* CONTAINS THE ENTIRE SYSTEM TO MAP MEMORIES TO LOCATIONS */
 
 .edit-palace {
@@ -31,140 +96,65 @@ body {
     /* flex-direction: column;  */
 }
 
-/* MAP */
+/* LOCI ADD */
 
-.map {
-    flex: 1 0 100vmin; 
-    width: 100vmin; 
-    height: 100vmin; 
-
-    background-color: #eee;
-
-    display: grid; 
-    grid-template-columns: repeat(var(--rooms-per-side), 1fr);
-    grid-template-rows: repeat(var(--rooms-per-side), 1fr);
+.loci-add-button {
+    background-color: #ff08; 
 }
 
-/* ROOMS */
-
-.room {
-    background-color: #888; 
-    
-    border: 1px solid #000; 
-
-    display: relative; 
+.loci-add-button-icon {
+    height: calc(2 * var(--c)); 
+    width: calc(2 * var(--c)); 
 }
 
-.room[active = 'true'] {
-    background-color: #ccc; 
-}
-
-.room[dragover = "true"] {
-    background-color: #fff;
-}
-
-/* BUTTONS */
-
-.buttons {
-    display: flex; 
-    flex-wrap: wrap; 
-
-    background-color: #222; 
-    border: 1px solid #000; 
-}
-
-.buttons > * {
-    flex: 0 1 33.33%; 
-    height: 4rem; 
-    
-    background-color: #888; 
-    
-    cursor: pointer; 
-    border-radius: 16rem; 
-
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-}
-
-/* MEMORIES */
+/* LOCI LIST */
 
 .loci {
-    overflow: scroll; 
-    flex: 1 1 100%; 
-    /* height: 200px;  */
+    overflow-y: scroll; 
+    flex: 1 1 0; 
+    width: 100%; 
+    height: calc(24 * var(--c)); 
     
-    background-color: #aaa; 
-
     display: flex; 
     flex-wrap: wrap;
     align-content: flex-start; 
 }
 
-.locus {
-    position: relative; 
-    flex: 0 1 33.33%; 
-    height: 200px; 
+/* INDIVIDUAL LOCUS */
 
-    background-color: #888; 
-    
-    border: 1px solid #000; 
-
-    display: flex; 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
 .locus[being-dragged = "true"] {
     opacity: 0.66; 
 }
 
+.locus-controls {
+    width: calc(4 * var(--c)); 
+    
+    display: flex; 
+    justify-content: flex-end;
+}
+
+.locus-controls > * { 
+    height: var(--c); 
+    width: var(--c); 
+
+    cursor: pointer; 
+}
+
 .mnemonic {
-    position: absolute; 
-    top: 0; 
-    right: 0; 
-    bottom: 0; 
-    left: 0; 
+    cursor: grab; 
 }
 
 .memory {
-    position: absolute; 
-    right: 0; 
-    bottom: 0; 
-    left: 0; 
-    height: 2.4em; 
-
-    background-color: #eee; 
-
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-}
-
-.locus .download, 
-.locus .erase {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 2ch; 
-    height: 2ch; 
-
-    font-size: 2rem; 
-    font-weight: 900; 
-    background-color: #000; 
-    color: #fff; 
-
-    cursor: pointer; 
-    outline: 1px solid #fff; 
+    height: calc(2 * var(--c)); 
+    overflow: hidden;
     
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-}
+    font-size: 0.5rem; 
 
-.locus .download {
-    left: unset; 
-    right: 0; 
+    text-overflow: ellipsis;
+
+    display: flex; 
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 /* ADD MEMORY INTERFACE */
@@ -180,4 +170,43 @@ body {
     left: var(--offset); 
 
     background-color: #444;
+}
+
+/* MAP */
+
+.map {
+    flex: 0 0 calc(24 * var(--c)); 
+    width: calc(24 * var(--c)); 
+    height: calc(24 * var(--c)); 
+
+    background-color: #eee;
+
+    display: grid; 
+    grid-template-columns: repeat(var(--rooms-per-side), 1fr);
+    grid-template-rows: repeat(var(--rooms-per-side), 1fr);
+}
+
+/* ROOMS */
+
+.room {
+    background-color: var(--theme-color-negative); 
+    
+    border: 1px solid #000; 
+    cursor: crosshair;
+
+    display: relative; 
+}
+
+.room[active = 'true'] {
+    background-color: var(--theme-color); 
+
+    /* cursor: not-allowed;  */
+}
+
+.room[dragover = "true"] {
+    background-color: #fff;
+}
+    
+.room:nth-of-type(1) {
+    background-color: #fff; 
 }

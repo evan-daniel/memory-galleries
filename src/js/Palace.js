@@ -38,6 +38,10 @@ class Palace {
                 }
             }
         }
+
+        // FIRST ROOM SHOULD ALWAYS BE ACTIVE
+
+        this.rooms[0][0].active = true; 
     }
 
     async wrangle(palace) {

@@ -7,19 +7,79 @@
         <title>LociAI</title>
     </head>
     <body>
+        <div class="header">
+            
+            <div class="header-global">
+                
+                <!-- THE NAME OF THE SITE -->
+    
+                <a class="brand" href="/">
+                    <div class="brand-first-word">
+                        <div class="brand-first-word-letter">
+                            L
+                        </div>
+                        <div class="brand-first-word-letter">
+                            O
+                        </div>
+                        <div class="brand-first-word-letter">
+                            C
+                        </div>
+                        <div class="brand-first-word-letter">
+                            I
+                        </div>
+                    </div>
+                    <div class="brand-second-word">
+                        <div class="brand-second-word-main">
+                            ai
+                        </div>
+
+                        <!-- COPYRIGHT AND CONTACT -->
+                        
+                        <div class="copyright">
+                            © 2022 evan daniel<br />
+                            @ evandaniel.com
+                        </div>
+                    </div>
+                    
+                </a>
+                
+            </div>
+            
+            <div class="header-local">
+                <div class="header-local-play" href="/game" component="card">
+                    <a class="header-local-play-button" href="/game" component="card-button">
+                        <div class="header-local-play-button-icon" img="play_icon"></div>
+                    </a>
+                    <div class="header-local-play-headline" component="card-headline">
+                        Play
+                    </div>
+                </div>
+                <div class="palace_title"></div>
+            </div>
+            
+        </div>
         
         <div class="edit-palace">
-            <div class="map"></div>
 
+            <!-- THE FLOOR LAYOUT OF THE PALACE, POPULATED BY JAVASCRIPT -->
+
+            <div class="map"></div> 
+
+            <!-- CONTAINS ALL THE BUTTONS AND INFORMATION ASIDE FROM THE MAP OF THE PALACE -->
+            
             <div class="interface">
-                <div class="buttons">
-                    <a class="home-link" href="/">HOME</a>
-                    <a class="start-button" href="/game">START</a>
-                    <div class="mode-push-locus">ADD</div>
-                    <div class="clear">CLEAR</div>
+                <div class="loci">
+                    <div class="loci-list"></div>
+
+                    <div class="loci-add" component="card">
+                        <div class="loci-add-button" component="card-button">
+                            <div class="loci-add-button-icon" img="loci-add-icon"></div>
+                        </div>
+                        <div class="loci-add-headline" component="card-headline"> 
+                            Add
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="loci"></div>
 
                 <!-- DISPLAY THE INTERFACE DURING DEV -->
                 <!-- <div class="add-memory-interface" style="display: block;"> -->
@@ -28,17 +88,27 @@
                     <div class="close">x</div>
 
                     <div class="push-memory">
-                        <div class="instruction">
-                            WHAT ARE YOU TRYING TO MEMORIZE
+                        <div class="push-instruction">
+                            <div class="push-answer-instruction-headline">
+                                What are you trying to memorize?  
+                            </div>
+                            <div class="push-answer-instruction-copy">
+                                This is the "answer" once you play; start out with something brief
+                            </div>
                         </div>
                         <div class="memory-candidate" contenteditable="true">
-                            TYPE HERE
+                            Your Answer
                         </div>
                     </div>
 
                     <div class="push-association">
-                        <div class="instruction">
-                            WHAT DO YOU ASSOCIATE IT WITH
+                        <div class="push-association-instruction">
+                            <div class="push-association-instruction-headline">
+                                What do you associate with it?  
+                            </div>
+                            <div class="push-association-instruction-copy">
+                                This will automatically generate a visual image of your association.  Pick something specific that will be visually memorable.  
+                            </div>
                         </div>
                         <div class="association-candidate" contenteditable="true">
                             TYPE HERE
@@ -58,16 +128,23 @@
                     
                 </div>
             </div>
+
         </div>
         
         <template type="locus">
-            <div class="locus">
-                <div class="mnemonic"></div>
-                <div class="memory" contenteditable="true"></div>
-                <div class="erase">×</div>
-                <a class="download">⇩</a>
+            <div class="locus" component="card">
+                <div class="locus-controls">
+                    <div class="locus-controls-edit_mnemonic" img="edit-mnemonic"></div>
+                    <div class="locus-controls-edit_text" img="edit-text"></div>
+                    <a class="locus-controls-download" img="download"></a>
+                    <div class="locus-controls-erase" img="delete"></div>
+                </div>
+                <div class="mnemonic" component="card-button"></div>
+                <div class="memory" component="card-headline"></div>
             </div>
         </template>
+
+
 
     </body>
 </html>

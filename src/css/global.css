@@ -1,14 +1,6 @@
 /* FONT */
 
-/* OPTIONS
-
-GENTIUM PLUS
-YUJI SYUKU
-
-*/
-
 @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono&family=Cinzel:wght@400&display=swap');
-
 
 /* GENERAL */
 
@@ -70,17 +62,113 @@ img {
     object-position: center;
 }
 
-/* MATERIAL ICONS */
+/* CARD COMPONENT */
 
-.material-icons.theme-color {
-    color: #f0f; 
+[component = "card"] {
+    height: calc(8 * var(--c)); 
+    width: calc(8 * var(--c)); 
+
+    display: flex; 
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
 }
 
-.my-class {
-    height: 200px; 
-    width: 200px; 
-    background-color: #0002; 
+[component = "card-button"] {
+    height: calc(4 * var(--c)); 
+    width: calc(4 * var(--c)); 
 
+    background-color: #fff;
+    text-align: center;
+    font-weight: 900; 
+
+    cursor: pointer;
+    border: var(--skeuomorphic-shadow-border); 
+
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+[component = "card-headline"] {
+    height: calc(2 * var(--c)); 
+    width: calc(4 * var(--c)); 
+    
+    text-align: center; 
+    font-family: var(--tt); 
+    font-weight: 900; 
+
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+/* COMMON CONTENT */
+
+/* BRAND */
+
+.brand {
+    height: calc(8 * var(--c)); 
+    width: calc(32 * var(--c)); 
+    
+    background-color: var(--theme-color-negative); 
+    color: #fff; 
+    font-weight: 900; 
+
+    line-height: 1;
+
+    display: flex; 
+    justify-content: flex-start;
+    align-items: center; 
+}
+
+.brand-second-word, 
+.brand-first-word {
+    height: calc(8 * var(--c)); 
+    width: calc(8 * var(--c)); 
+}
+
+.brand-first-word {
+    font-size: 4rem; 
+    font-family: var(--rm); 
+
+    display: flex; 
+    flex-wrap: wrap;
+}
+
+.brand-first-word-letter {
+    flex: 1 1 50%; 
+    height: calc(4 * var(--c)); 
+    
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-end;
+}
+
+.brand-first-word-letter:nth-of-type(1), 
+.brand-first-word-letter:nth-of-type(4) {
+    background-color: #0f08; 
+}
+
+.brand-second-word {
+    font-size: 6rem; 
+    font-family: var(--tt); 
+    background-color: #0f08; 
+
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.tagline {
+    flex: 1 0 auto; 
+    padding: var(--c); 
+
+    font-family: var(--rm); 
+
+    display: flex; 
+    align-items: flex-end; 
 }
 
 /* DEV GRID */

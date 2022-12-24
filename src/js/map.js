@@ -7,9 +7,25 @@ const use_api_in_dev = true;
 import '../css/global.css'; 
 import '../css/map.css'; 
 
+import global from './global.js'; 
 import Palace from './Palace.js'; 
 
+// ICONS
+
+import play_icon from '@material-design-icons/svg/two-tone/play_circle_filled.svg'; 
+import add_loci_icon from '@material-design-icons/svg/filled/add_circle_outline.svg'; 
+import edit_mnemonic_icon from '@material-design-icons/svg/filled/edit.svg'; 
+import edit_text_icon from '@material-design-icons/svg/filled/edit_note.svg'; 
+import delete_icon from '@material-design-icons/svg/filled/delete_forever.svg'; 
+import download_icon from '@material-design-icons/svg/filled/download.svg'; 
+
 window.addEventListener('DOMContentLoaded', async () => {
+
+    // GLOBAL INIT
+
+    global(); 
+    document.querySelector('[img = "play_icon"]').style.backgroundImage = `URL("${play_icon}")`; 
+    document.querySelector('[img = "loci-add-icon"]').style.backgroundImage = `URL("${add_loci_icon}")`; 
     
     // GET PALACES FROM LOCAL STORAGE
     
@@ -29,11 +45,22 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const palace_data_buf = JSON.parse(localStorage.getItem(palaces.active)); 
     if(palace_data_buf) {
-        console.log('PALACE DATA', palace_data_buf); 
+        console.log('PALACE WAS FOUND', palace_data_buf); 
         await palace.wrangle(palace_data_buf); 
     }
     console.log('PALACE AFTER INIT', palace); 
     palace.persist(); 
+    
+    // DEFINE THAT THE USER CREATED THE PALACE PREVIOUSLY IF IT HAS A LOCUS
+
+    let palace_has_previous_content = false; 
+    if(0 < palace.loci.length) {
+        palace_has_previous_content = true; 
+    } 
+
+    // SET THE NAME OF THE PALACE
+
+    document.querySelector('.palace_title').innerText = palace.filename; 
 
     /* 
     * 
@@ -90,20 +117,28 @@ window.addEventListener('DOMContentLoaded', async () => {
         const frag_locus = template.content.cloneNode(true); 
         frag_locus.querySelector('.memory').innerText = locus.memory ? `${locus.memory}` : `${locus.id} : ${locus.fileName}`; 
         const ref_dom_locus = frag_locus.querySelector('.locus')
-        document.querySelector('.loci').prepend(frag_locus); 
+        document.querySelector('.loci-add').after(frag_locus); 
         
-        ref_dom_locus.setAttribute('draggable', true); 
         ref_dom_locus.setAttribute('id', `${locus.id}`); 
         
+        // IMAGES
+        
+        ref_dom_locus.querySelector('[img = "edit-mnemonic"]').style.backgroundImage = `URL("${edit_mnemonic_icon}")`; 
+        ref_dom_locus.querySelector('[img = "edit-text"]').style.backgroundImage = `URL("${edit_text_icon}")`; 
+        ref_dom_locus.querySelector('[img = "delete"]').style.backgroundImage = `URL("${delete_icon}")`; 
+        ref_dom_locus.querySelector('[img = "download"]').style.backgroundImage = `URL("${download_icon}")`; 
+        
         // DATA TRANSFER
-
-        ref_dom_locus.addEventListener('dragstart', dragstart => {
-            ref_dom_locus.setAttribute('being-dragged', 'true'); 
+        
+        const mnemonic = ref_dom_locus.querySelector('.mnemonic'); 
+        mnemonic.setAttribute('draggable', true); 
+        mnemonic.addEventListener('dragstart', dragstart => {
+            mnemonic.setAttribute('being-dragged', 'true'); 
             dragstart.dataTransfer.setData('text', `${locus.id}`); 
         }); 
 
-        ref_dom_locus.addEventListener('dragend', () => {
-            ref_dom_locus.setAttribute('being-dragged', 'false'); 
+        mnemonic.addEventListener('dragend', () => {
+            mnemonic.setAttribute('being-dragged', 'false'); 
         }); 
         
         // ASSERTION
@@ -113,9 +148,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         memory.addEventListener('keydown', dom_memory_keydown); 
         memory.addEventListener('focusout', dom_memory_submit); 
 
-        // BIND TO ERASE
+        // BIND EVENTS
 
-        ref_dom_locus.querySelector('.locus .erase').addEventListener('click', () => erase_locus(ref_dom_locus)); 
+        ref_dom_locus.querySelector('.locus-controls-erase').addEventListener('click', () => erase_locus(ref_dom_locus)); 
+
+        const dom_memory = ref_dom_locus.querySelector('.memory'); 
+        ref_dom_locus.querySelector('.locus-controls-edit_text').addEventListener('click', () => {
+            dom_memory.setAttribute('contenteditable', 'true'); 
+            dom_memory.focus(); 
+        }); 
+        dom_memory.addEventListener('focusout', () => dom_memory.setAttribute('contenteditable', 'false')); 
         
         // ADD THE FILE
         
@@ -126,7 +168,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             const res = rdr.result; 
             ref_dom_locus.querySelector('.locus .mnemonic').style.backgroundImage = `URL("${res}")`; 
 
-            const download_ref = ref_dom_locus.querySelector('.locus .download'); 
+            const download_ref = ref_dom_locus.querySelector('.locus-controls-download'); 
             download_ref.setAttribute('href', rdr.result); 
             download_ref.setAttribute('download', `${locus.memory || locus.id}.png`); 
         }); 
@@ -264,7 +306,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // CLEAR THE MAP
 
-    document.querySelector('.clear').addEventListener('click', click => {
+    document.querySelector('.clear')?.addEventListener('click', click => {
         palace = new Palace(); 
         palace.init(); 
         palace.persist(); 
@@ -291,7 +333,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // PUSH LOCUS INTERFACE VISIBILITY
     
     const dom_push_locus = document.querySelector('.push-locus'); 
-    document.querySelector('.mode-push-locus').addEventListener('click', () => dom_push_locus.style.display = 'block'); 
+    document.querySelector('.loci-add').addEventListener('click', () => dom_push_locus.style.display = 'block'); 
 
     const reset_dom_push_locus = () => {
         dom_push_locus.querySelector('.memory-candidate').innerText = 'TYPE HERE'

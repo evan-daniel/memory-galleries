@@ -81,6 +81,7 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log('NEW MALACE', pal_key); 
     palaces.keys.push(pal_key); 
     palaces.active = pal_key; 
+    edit_pal(pal_key); 
   }; 
   document.querySelector('.callout-create-submit').addEventListener('click', () => {
     const new_pal_key = document.querySelector('.callout-create-name').value; 

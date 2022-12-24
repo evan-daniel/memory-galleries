@@ -3,8 +3,6 @@
 let allow_dev_grid = false; 
 // allow_dev_grid = true; 
 
-import dev_grid from "./dev-grid.js";
-
 const global = () => {
     const resize_def = () => {
         const w = document.documentElement.clientWidth; 
@@ -52,5 +50,23 @@ const global = () => {
         dev_grid(); 
     }
 }
+
+const dev_grid = () => {
+    if(process.env.NODE_ENV !== 'development') {
+        return; 
+    }
+
+    const grid = document.createElement('div'); 
+    grid.classList.add('dev-grid'); 
+    document.body.appendChild(grid); 
+    console.log(grid.clientWidth)
+
+    for(let i = 0; i < 8192; ++i) {
+        
+        const cell = document.createElement('div'); 
+        cell.classList.add('dev-grid-cell'); 
+        grid.appendChild(cell); 
+    }
+}; 
 
 export default global; 

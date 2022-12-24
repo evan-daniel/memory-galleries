@@ -46,63 +46,6 @@ body {
     height: calc(100 * var(--vh)); 
 }
 
-/* BRAND */
-
-.brand {
-    height: calc(8 * var(--c)); 
-    width: calc(100 * var(--vmin)); 
-    
-    background-color: var(--theme-color-negative); 
-    color: #fff; 
-    font-weight: 900; 
-
-    line-height: 1;
-
-    justify-content: flex-start;
-}
-
-.brand-second-word, 
-.brand-first-word {
-    height: calc(8 * var(--c)); 
-    width: calc(8 * var(--c)); 
-}
-
-.brand-first-word {
-    font-size: 4rem; 
-    font-family: var(--rm); 
-
-    display: flex; 
-    flex-wrap: wrap;
-}
-
-.brand-first-word-letter {
-    flex: 1 1 50%; 
-    height: calc(4 * var(--c)); 
-    
-    align-items: flex-end;
-}
-
-.brand-first-word-letter:nth-of-type(1), 
-.brand-first-word-letter:nth-of-type(4) {
-    background-color: #0f08; 
-}
-
-.brand-second-word {
-    font-size: 6rem; 
-    font-family: var(--tt); 
-    background-color: #0f08; 
-}
-
-.tagline {
-    flex: 1 0 auto; 
-    padding: var(--c); 
-
-    font-family: var(--rm); 
-
-    display: flex; 
-    align-items: flex-end; 
-}
-
 /* HERO */
 
 .callout,
