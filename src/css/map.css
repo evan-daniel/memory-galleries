@@ -91,15 +91,12 @@ body {
 .interface {
     position: relative; 
     flex: 0 1 100%; 
-    
-    /* display: flex;  */
-    /* flex-direction: column;  */
 }
 
 /* LOCI ADD */
 
 .loci-add-button {
-    background-color: #ff08; 
+    /* background-color: #ff08;  */
 }
 
 .loci-add-button-icon {
@@ -157,19 +154,20 @@ body {
     align-items: flex-start;
 }
 
-/* ADD MEMORY INTERFACE */
+/* PUSH LOCUS MODAL */
 
-.push-locus {
-    z-index: 100; 
-    position: absolute; 
+.push_locus-modal-memory-candidate, 
+.push_locus-modal-mnemonic-candidate {
+    width: calc(24 * var(--c)); 
+    margin: calc(1 * var(--c)) 0 calc(1 * var(--c)); 
 
-    --offset: 2rem; 
-    top: var(--offset); 
-    right: var(--offset); 
-    bottom: var(--offset); 
-    left: var(--offset); 
+    font-family: var(--tt); 
+    
+    border-bottom: 2px solid var(--theme-color); 
+}
 
-    background-color: #444;
+.push_locus-modal-custom-instruction-headline {
+    margin: var(--c) 0 0; 
 }
 
 /* MAP */
@@ -191,7 +189,7 @@ body {
 .room {
     background-color: var(--theme-color-negative); 
     
-    border: 1px solid #000; 
+    border: 1px solid #aaa; 
     cursor: crosshair;
 
     display: relative; 
@@ -199,8 +197,6 @@ body {
 
 .room[active = 'true'] {
     background-color: var(--theme-color); 
-
-    /* cursor: not-allowed;  */
 }
 
 .room[dragover = "true"] {

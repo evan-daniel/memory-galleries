@@ -62,6 +62,10 @@ img {
     object-position: center;
 }
 
+/* 
+    COMPONENTS
+ */
+
 /* CARD COMPONENT */
 
 [component = "card"] {
@@ -83,7 +87,8 @@ img {
     font-weight: 900; 
 
     cursor: pointer;
-    border: var(--skeuomorphic-shadow-border); 
+    /* border: var(--skeuomorphic-shadow-border);  */ 
+    box-shadow: var(--skeuomorphic-shadow); 
 
     display: flex; 
     flex-direction: column;
@@ -104,7 +109,51 @@ img {
     align-items: center;
 }
 
-/* COMMON CONTENT */
+[component = "card-icon-desc"] {
+    font-family: var(--tt); 
+    font-weight: 900; 
+}
+
+/* CARD */
+
+[comp = "modal"] {
+    z-index: 100; 
+    position: fixed; 
+    top: calc(8 * var(--c)); 
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0; 
+    
+    background-color: #0008;
+}
+
+[comp = "modal-card"] {
+    position: relative; 
+    margin: calc(4 * var(--c)) calc(8 * var(--c)); 
+    padding: calc(4 * var(--c)); 
+    
+    background-color: #fff; 
+}
+
+[comp = "modal-close"] {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    height: calc(2 * var(--c)); 
+    width: calc(2 * var(--c)); 
+
+    cursor: pointer; 
+}
+
+[comp = "modal-instruction-copy"] {
+    font-family: var(--tt); 
+    font-size: 0.5rem; 
+}
+
+/* 
+    COMMON ITEMS
+ */
 
 /* BRAND */
 

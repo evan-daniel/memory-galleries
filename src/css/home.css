@@ -71,15 +71,9 @@ body {
     align-items: center; 
 }
 
-.banner-instruction:nth-of-type(2) {
-    /* flex-direction: row-reverse;  */
-}
-
 .banner-instruction-copy {
     flex: 1 0 50%; 
     padding: 0 var(--text-indent); 
-
-    /* background-color: #00f4; */
 
     justify-content: flex-start;
 }    
@@ -199,8 +193,11 @@ body {
     padding: var(--text-indent); 
     
     font-size: 2rem;    
+    color: #fff; 
+    font-weight: 700; 
+    letter-spacing: 0.15ch;
 
-    background: linear-gradient(to bottom, #ffff 0, #fffa 50%, #ffff 100%), linear-gradient(to right, var(--theme-color) 0, var(--theme-color-negative) calc(32 * var(--c))); 
+    background: linear-gradient(to bottom, #0000 0, #0000 calc(4 * var(--c)), var(--theme-color) calc(4 * var(--c))), linear-gradient(to right, var(--theme-color) 0, var(--theme-color) calc(32 * var(--c)), var(--theme-color-negative) calc(32 * var(--c))); 
 
     display: flex; 
     justify-content: flex-start;

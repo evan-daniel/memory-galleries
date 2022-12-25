@@ -1,6 +1,12 @@
 // SETTINGS
 
-const use_api_in_dev = true; 
+let use_api_in_dev = true; 
+
+let enforce_show_push_locus_modal = false; 
+// enforce_show_push_locus_modal = true; 
+
+let enforce_show_error = false; 
+// enforce_show_error = true; 
 
 // IMPORT
 
@@ -12,21 +18,16 @@ import Palace from './Palace.js';
 
 // ICONS
 
-import play_icon from '@material-design-icons/svg/two-tone/play_circle_filled.svg'; 
 import add_loci_icon from '@material-design-icons/svg/filled/add_circle_outline.svg'; 
-import edit_mnemonic_icon from '@material-design-icons/svg/filled/edit.svg'; 
-import edit_text_icon from '@material-design-icons/svg/filled/edit_note.svg'; 
+import clothes_icon from '@material-design-icons/svg/filled/close.svg'; 
 import delete_icon from '@material-design-icons/svg/filled/delete_forever.svg'; 
 import download_icon from '@material-design-icons/svg/filled/download.svg'; 
+import edit_mnemonic_icon from '@material-design-icons/svg/filled/edit.svg'; 
+import edit_text_icon from '@material-design-icons/svg/filled/edit_note.svg'; 
+import play_icon from '@material-design-icons/svg/two-tone/play_circle_filled.svg'; 
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    // GLOBAL INIT
-
-    global(); 
-    document.querySelector('[img = "play_icon"]').style.backgroundImage = `URL("${play_icon}")`; 
-    document.querySelector('[img = "loci-add-icon"]').style.backgroundImage = `URL("${add_loci_icon}")`; 
-    
     // GET PALACES FROM LOCAL STORAGE
     
     const palaces = JSON.parse(localStorage.getItem('palaces')); 
@@ -51,12 +52,38 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.log('PALACE AFTER INIT', palace); 
     palace.persist(); 
     
-    // DEFINE THAT THE USER CREATED THE PALACE PREVIOUSLY IF IT HAS A LOCUS
+    // REF
 
-    let palace_has_previous_content = false; 
-    if(0 < palace.loci.length) {
-        palace_has_previous_content = true; 
-    } 
+    const dom_push_locus = document.querySelector('.push_locus'); 
+    const dom_error_gen = document.querySelector('.error-generation'); 
+
+    // DESTROY OLD REF IF USER EDITS SUCCESSFULLY
+
+    let destroy_locus_cand = undefined; 
+    
+    // INIT PAGE
+
+    global(); 
+    document.querySelector('[img = "play_icon"]').style.backgroundImage = `URL("${play_icon}")`; 
+    document.querySelector('[img = "loci-add-icon"]').style.backgroundImage = `URL("${add_loci_icon}")`; 
+    document.querySelectorAll('[img = "close"]').forEach(el => el.style.backgroundImage = `URL("${clothes_icon}")`); 
+
+    if(palace.loci.length < 1 || enforce_show_push_locus_modal) {
+        document.querySelector('.push_locus').style.display = 'block'; 
+        document.querySelector('.push_locus-modal-memory-candidate').focus(); 
+    }
+    
+    if(enforce_show_error) {
+        document.querySelector('.error-generation').style.display = 'block'; 
+    }
+    document.querySelector('.error-modal-close').addEventListener('click', () => document.querySelector('.error-generation').style.display = 'none'); 
+
+    document.addEventListener('keydown', keydown => {
+        if(keydown.key === 'Escape') {
+            dom_push_locus.style.display = 'none'; 
+            dom_error_gen.style.display = 'none'; 
+        }
+    })
 
     // SET THE NAME OF THE PALACE
 
@@ -154,10 +181,18 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         const dom_memory = ref_dom_locus.querySelector('.memory'); 
         ref_dom_locus.querySelector('.locus-controls-edit_text').addEventListener('click', () => {
+            const dom_memory_initial_content = dom_memory.innerText; 
             dom_memory.setAttribute('contenteditable', 'true'); 
             dom_memory.focus(); 
+            dom_memory.innerText = dom_memory_initial_content; 
         }); 
         dom_memory.addEventListener('focusout', () => dom_memory.setAttribute('contenteditable', 'false')); 
+
+        ref_dom_locus.querySelector('.locus-controls-edit_mnemonic').addEventListener('click', () => {
+            document.querySelector('.push_locus-modal-memory-candidate').innerText = ref_dom_locus.querySelector('.memory').innerText; 
+            dom_push_locus.style.display = 'block'; 
+            destroy_locus_cand = ref_dom_locus; 
+        }); 
         
         // ADD THE FILE
         
@@ -190,6 +225,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             dom_room.setAttribute('row', y);
             dom_room.setAttribute('active', palace.rooms[y][x].active);  
             dom_room.setAttribute('locus', '-1'); 
+            dom_room.setAttribute('draggable', 'false'); 
             dom_rooms.appendChild(dom_room); 
 
             const mem_id = palace.rooms[y][x].locus; 
@@ -219,6 +255,22 @@ window.addEventListener('DOMContentLoaded', async () => {
         // SEARCH FOR ALL ROOMS WITH THE LOCUS AND DECOUPLE
 
         document.querySelectorAll(`.room[locus = "${id}"]`).forEach(room => remove_room_locus(room)); 
+    }; 
+
+    const replace_locus_in_rooms = (old_locus, new_id) => {
+        const old_id = +old_locus?.getAttribute('id'); 
+        if(typeof old_id !== 'number' && old_id < 0) {
+            return; 
+        }
+
+        document.querySelectorAll(`.room[locus = "${old_id}"]`).forEach(room => {
+            remove_room_locus(room); 
+
+            palace.rooms[+room.getAttribute('row')][+room.getAttribute('column')].locus = new_id; 
+            palace.persist(); 
+            push_bg_img(palace.loci.find(locus => locus.id === new_id).handle, room); 
+            room.setAttribute('locus', `${new_id}`); 
+        }); 
     }; 
     
     /* 
@@ -332,25 +384,24 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // PUSH LOCUS INTERFACE VISIBILITY
     
-    const dom_push_locus = document.querySelector('.push-locus'); 
-    document.querySelector('.loci-add').addEventListener('click', () => dom_push_locus.style.display = 'block'); 
+    document.querySelector('.loci-add-button').addEventListener('click', () => dom_push_locus.style.display = 'block'); 
 
     const reset_dom_push_locus = () => {
-        dom_push_locus.querySelector('.memory-candidate').innerText = 'TYPE HERE'
-        dom_push_locus.querySelector('.association-candidate').innerText = 'TYPE HERE'
+        dom_push_locus.querySelector('.push_locus-modal-memory-candidate').innerText = ''
+        dom_push_locus.querySelector('.push_locus-modal-mnemonic-candidate').innerText = ''
         dom_push_locus.style.display = 'none'; 
     }; 
-    document.querySelector('.push-locus .close').addEventListener('click', reset_dom_push_locus); 
+    document.querySelector('.push_locus-modal-close').addEventListener('click', reset_dom_push_locus); 
 
     // SUBMIT A NEW LOCUS FROM THE POP-UP INTERFACE
     
-    document.querySelector('.push-locus .push').addEventListener('click', async () => {
+    document.querySelector('.push_locus-modal-submit').addEventListener('click', async () => {
 
         // CHECK
 
-        const association_candidate = document.querySelector('.association-candidate').innerText; 
-        const memory_candidate = dom_push_locus.querySelector('.memory-candidate').innerText; 
-        if(!association_candidate || association_candidate === '' || association_candidate === 'TYPE HERE') {
+        const association_candidate = document.querySelector('.push_locus-modal-mnemonic-candidate').innerText; 
+        const memory_candidate = dom_push_locus.querySelector('.push_locus-modal-memory-candidate').innerText; 
+        if(!association_candidate || association_candidate === '' || association_candidate === '') {
             console.error('SUBMITTED — ABANDONED BECAUSE THE ASSOCIATION WAS EMPTY'); 
             return; 
         }
@@ -358,62 +409,76 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         // SEND API REQUEST FOR AI IMAGE
         
-        const response = await fetch("/api/gen", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ desc: association_candidate }),
-        });
-        const data = await response.json();
-        
-        // RESET THE ADD MEMORY INTERFACE
-
-        reset_dom_push_locus(); 
-        
-        // GO AHEAD AND ADD A MEMORY
-        
-        if(data) {
-            console.log('SUCCEED (POSTING)', data); 
+        try {
+            const response = await fetch("/api/gen", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ desc: association_candidate }),
+            });
+            const data = await response.json();
             
-            // PREAMBLE IF USING API
-            
-            const preamble = use_api_in_dev || process.env.NODE_ENV !== 'development' ? 'data:image/png;base64,' : ''; 
-            const mnemonic_fetched = await fetch(`${preamble}${data}`); 
-            
-            const mnemonic_blob = await mnemonic_fetched.blob(); 
-            const mnemonic_file = new File([mnemonic_blob], 'img.png', { type: mnemonic_blob.type }); 
-
-            let id = -1; 
-            if(mnemonic_file) {
-                id = await palace.push_locus(mnemonic_file); 
-            }
-            
-            // IF WE'VE ADDED A LOCUS TO THE PALACE
-            
-            if(id !== -1) {
-
-                // ADD AN ASSERTION IF IT'S THERE
-
-                if(memory_candidate && memory_candidate !== '' && memory_candidate !== 'TYPE HERE') {
-                    palace.set_locus_memory(id, memory_candidate); 
-                }
-
-                // ADD TO THE DOM
-                // ADD TO THE STORAGE
-                
-                push_dom_locus(palace.loci.find(locus => locus.id === id)); 
-                palace.persist(); 
-            }
+            // RESET THE ADD MEMORY INTERFACE
     
+            reset_dom_push_locus(); 
+            
+            // GO AHEAD AND ADD A MEMORY
+            
+            if(data) {
+                console.log('SUCCEED (POSTING)', data); 
+                
+                // PREAMBLE IF USING API
+                
+                const preamble = use_api_in_dev || process.env.NODE_ENV !== 'development' ? 'data:image/png;base64,' : ''; 
+                const mnemonic_fetched = await fetch(`${preamble}${data}`); 
+                
+                const mnemonic_blob = await mnemonic_fetched.blob(); 
+                const mnemonic_file = new File([mnemonic_blob], 'img.png', { type: mnemonic_blob.type }); 
+    
+                let id = -1; 
+                if(mnemonic_file) {
+                    id = await palace.push_locus(mnemonic_file); 
+                }
+                
+                // IF WE'VE ADDED A LOCUS TO THE PALACE
+                
+                if(id !== -1) {
+    
+                    // ADD AN ASSERTION IF IT'S THERE
+    
+                    if(memory_candidate && memory_candidate !== '' && memory_candidate !== 'TYPE HERE') {
+                        palace.set_locus_memory(id, memory_candidate); 
+                    }
+    
+                    // ADD TO THE DOM
+                    // ADD TO THE STORAGE
+                    
+                    push_dom_locus(palace.loci.find(locus => locus.id === id)); 
+                    palace.persist(); 
+                    
+                    // THIS STARTED AS AN EDITED LOCUS
+                    // DESTROY THE OLD ONE
+
+                    if(destroy_locus_cand) {
+                        replace_locus_in_rooms(destroy_locus_cand, id); 
+                        erase_locus(destroy_locus_cand); 
+                        destroy_locus_cand = undefined; 
+                    }
+                }
+        
+            }
+        } catch(e) {
+            console.error('FETCH FAILED', e); 
+            document.querySelector('.error-generation').style.display = 'block'; 
         }
     }); 
 
     // MANUALLY UPLOAD FILE
 
-    const dom_mnemonic_candidate = document.querySelector('.mnemonic-candidate'); 
+    const dom_mnemonic_candidate = document.querySelector('.push_locus-modal-custom-candidate'); 
     dom_mnemonic_candidate.addEventListener('change', async () => {
-        const memory = document.querySelector('.memory-candidate').innerText; 
+        const memory = document.querySelector('.push_locus-modal-memory-candidate').innerText; 
         
         const file = dom_mnemonic_candidate.files[0]; 
         let id = -1; 
@@ -432,6 +497,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             push_dom_locus(palace.loci.find(locus => locus.id === id)); 
             palace.persist(); 
             reset_dom_push_locus(); 
+
+            // THIS STARTED AS AN EDITED LOCUS
+            // DESTROY THE OLD ONE
+
+            replace_locus_in_rooms(destroy_locus_cand, id); 
+            erase_locus(destroy_locus_cand); 
+            destroy_locus_cand = undefined; 
         }
     }); 
 

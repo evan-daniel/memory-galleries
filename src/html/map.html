@@ -49,10 +49,9 @@
                 <div class="header-local-play" href="/game" component="card">
                     <a class="header-local-play-button" href="/game" component="card-button">
                         <div class="header-local-play-button-icon" img="play_icon"></div>
+                        <div component="card-icon-desc">Play</div>
                     </a>
-                    <div class="header-local-play-headline" component="card-headline">
-                        Play
-                    </div>
+                    <div component="card-headline"></div>
                 </div>
                 <div class="palace_title"></div>
             </div>
@@ -74,58 +73,73 @@
                     <div class="loci-add" component="card">
                         <div class="loci-add-button" component="card-button">
                             <div class="loci-add-button-icon" img="loci-add-icon"></div>
+                            <div component="card-icon-desc">
+                                Add
+                            </div>
                         </div>
                         <div class="loci-add-headline" component="card-headline"> 
-                            Add
                         </div>
                     </div>
                 </div>
 
                 <!-- DISPLAY THE INTERFACE DURING DEV -->
-                <!-- <div class="add-memory-interface" style="display: block;"> -->
                     
-                <div class="push-locus" style="display: none;">
-                    <div class="close">x</div>
+                <div class="push_locus" style="display: none;" comp="modal">
 
-                    <div class="push-memory">
-                        <div class="push-instruction">
-                            <div class="push-answer-instruction-headline">
-                                What are you trying to memorize?  
-                            </div>
-                            <div class="push-answer-instruction-copy">
-                                This is the "answer" once you play; start out with something brief
-                            </div>
+                    <div comp="modal-card">
+                        <div class="push_locus-modal-close" img="close" comp="modal-close"></div>
+    
+                        <!-- MEMORY -->
+                        
+                        <div comp="modal-instruction-headline">
+                            What are you trying to memorize?  
                         </div>
-                        <div class="memory-candidate" contenteditable="true">
-                            Your Answer
+                        <div comp="modal-instruction-copy">
+                            This is the "answer" once you play; start out with something brief
+                        </div>
+                        <div class="push_locus-modal-memory-candidate" contenteditable="true"></div>
+
+                        <!-- MNEMONIC -->
+    
+                        <div comp="modal-instruction-headline">
+                            What do you associate with it?  
+                        </div>
+                        <div comp="modal-instruction-copy">
+                            This will automatically generate a visual image of your association.  Pick something specific that will be visually memorable.  
+                        </div>
+                        <div class="push_locus-modal-mnemonic-candidate" contenteditable="true"></div>
+                        
+                        <!-- SUBMIT FOR GENERATION -->
+                        
+                        <button class="push_locus-modal-submit">
+                            Create
+                        </button>
+
+                        <!-- SUBMIT YOUR OWN IMAGE INSTRUCTION -->
+    
+                        <div class="push_locus-modal-custom-instruction-headline" comp="modal-instruction-headline">
+                            …or add an image of your own
+                        </div>
+                        <input class="push_locus-modal-custom-candidate" type="file" accept="image/jpeg, image/png, image/jpg">
+
+                    </div>
+                </div>
+
+                <!-- DISPLAYED WHEN IMAGE CANNOT BE CREATED -->
+                
+                <div class="error-generation" comp="modal" style="display: none;">
+                    <div comp="modal-card">
+                        <div class="error-modal-close" img="close" comp="modal-close"></div>
+                        
+                        <div>
+                            <div comp="modal-instruction-headline">
+                                There was an error generating your image
+                            </div>
+                            <div comp="modal-instruction-copy">
+                                You can still upload your own image and use the app
+                            </div>
                         </div>
                     </div>
-
-                    <div class="push-association">
-                        <div class="push-association-instruction">
-                            <div class="push-association-instruction-headline">
-                                What do you associate with it?  
-                            </div>
-                            <div class="push-association-instruction-copy">
-                                This will automatically generate a visual image of your association.  Pick something specific that will be visually memorable.  
-                            </div>
-                        </div>
-                        <div class="association-candidate" contenteditable="true">
-                            TYPE HERE
-                        </div>
-                    </div>
-                    
-                    <button class="push">
-                        SUBMIT
-                    </button>
-
-                    <div class="push-mnemonic">
-                        <div class="instruction">
-                            … OR ADD AN IMAGE OF YOUR OWN
-                        </div>
-                        <input class="mnemonic-candidate" type="file" accept="image/jpeg, image/png, image/jpg">
-                    </div>
-                    
                 </div>
             </div>
 
