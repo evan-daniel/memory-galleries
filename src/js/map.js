@@ -393,7 +393,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }; 
     document.querySelector('.push_locus-modal-close').addEventListener('click', () => {
         destroy_locus_cand = undefined; 
-        reset_dom_push_locus; 
+        reset_dom_push_locus(); 
     }); 
 
     // SUBMIT A NEW LOCUS FROM THE POP-UP INTERFACE
