@@ -206,8 +206,20 @@ img {
     background-color: #0f08; 
 
     display: flex; 
+    flex-direction: column;
     justify-content: center; 
     align-items: center; 
+}
+
+.copyright {
+    font-weight: 400; 
+    font-size: 0.5rem; 
+    font-family: var(--tt); 
+    color: #fff; 
+    
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: flex-end; 
 }
 
 .tagline {

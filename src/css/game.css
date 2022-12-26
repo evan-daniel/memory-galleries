@@ -4,16 +4,17 @@ body {
     height: 100vh; 
 }
 
-/* UI */
+/* HEADER */
+
+.header {
+    position: fixed; 
+}
 
 .brand {
-    position: fixed; 
-    right: 15px; 
-
-    text-decoration: none; 
-    font-weight: 700; 
-    color: #FFF; 
+    width: unset; 
 }
+
+/* UI */
 
 .name {
     position: fixed; 
