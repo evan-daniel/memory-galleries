@@ -14,6 +14,21 @@ body {
     width: unset; 
 }
 
+.brand-second-word {
+    flex-direction: column; 
+}
+
+.copyright {
+    font-weight: 400; 
+    font-size: 0.5rem; 
+    font-family: var(--tt); 
+    color: #fff; 
+    
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: flex-end; 
+}
+
 /* UI */
 
 .name {

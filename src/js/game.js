@@ -110,12 +110,34 @@ window.addEventListener('DOMContentLoaded', async () => {
             
             const locus_id = palace.rooms[y][x].locus; 
             if(locus_id !== -1) {
+                const loci_length = 2.5; 
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0xff8888 }); 
-                const loci_mesh = new Three.Mesh(new Three.PlaneGeometry(5, 5), mat_blue); 
+                const loci_mesh = new Three.Mesh(new Three.PlaneGeometry(loci_length, loci_length), mat_blue); 
                 loci_mesh.material.side = Three.DoubleSide; 
-                loci_mesh.position.set(x * wall_width, 2.5, y * wall_width + wall_width / 2); 
-                loci_mesh.rotation.y += Math.PI / 4; 
+
+                // POSITION IN ROOM BASED ON WHERE THERE ARE WALLS
+                
+                const loci_height = 2.5; 
+                const in_front_offset = 0.01; 
+                if(y === 0 || !palace.rooms[y - 1][x]?.active) {
+                    loci_mesh.position.set(x * wall_width, loci_height, y * wall_width + 0.01); 
+                } else if(x === palace.rooms_per_side - 1 || !palace.rooms[y][x + 1]?.active) {
+                    loci_mesh.position.set(x * wall_width + 0.5 * wall_width - 0.01, loci_height, y * wall_width + 0.5 * wall_width); 
+                    loci_mesh.rotation.y = -Math.PI / 2; 
+                } else if(y === palace.rooms_per_side - 1 || !palace.rooms[y + 1][x]?.active) {
+                    loci_mesh.position.set(x * wall_width, loci_height, (y + 1) * wall_width - 0.01); 
+                    loci_mesh.rotation.y = Math.PI; 
+                } else if(x === 0 || !palace.rooms[y][x - 1]?.active) {
+                    loci_mesh.position.set(x * wall_width - 0.5 * wall_width + 0.01, loci_height, y * wall_width + 0.5 * wall_width); 
+                    loci_mesh.rotation.y = Math.PI / 2; 
+                } else {
+                    loci_mesh.position.set(x * wall_width, 0.01, y * wall_width + 0.5 * wall_width); 
+                    loci_mesh.rotation.y = Math.PI; 
+                    loci_mesh.rotation.x = Math.PI / 2; 
+                }
+                
                 loci_mesh.name = 'locus'; 
+                
                 loci_mesh.custom = {
                     id: locus_id, 
                 }; 
