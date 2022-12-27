@@ -1,30 +1,36 @@
-import '../css/global.css'; 
-import '../css/game.css'; 
+// LIB
 
 import * as Three from 'three'; 
 
+// OO
+
 import Palace from './Palace.js'; 
+
+// CSS
+
+import '../css/global.css'; 
+import '../css/game.css'; 
+
+// IMAGES 
+
+import floor_diff from '../tex/concrete_wall_001_diff_1k.jpg'; 
+import wall_diff from '../tex/white_sandstone_blocks_02_diff_1k.jpg'; 
+import ceil_diff from '../tex/white_plaster_02_diff_1k.jpg'; 
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    // GET PERSISTED DATA
+    // INSTANTIATE PALACE FROM LOCALSTORAGE
+    // SAVE 
     
-    // GET PALACES FROM LOCAL STORAGE
-
     const palaces = JSON.parse(localStorage.getItem('palaces')); 
     if(!palaces || !palaces.active) { 
         window.location = '/'; 
     }
     
-    // INSTANTIATE PALACE
-    
     let palace = new Palace(palaces.active); 
     await palace.init(); 
     document.documentElement.style.setProperty('--rooms-per-side', `${palace.rooms_per_side}`); 
     
-    // LOAD LOCALSTORAGE DATA IF IT EXISTS
-    // SAVE NO MATTER WHAT
-
     const palace_data_buf = JSON.parse(localStorage.getItem(palaces.active)); 
     if(palace_data_buf) {
         console.log('PALACE DATA', palace_data_buf); 
@@ -54,10 +60,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight); 
     renderer.setPixelRatio(window.devicePixelRatio); 
     renderer.shadowMap.enabled = true; 
+    renderer.shadowMap.type = Three.PCFSoftShadowMap; 
 
     const scene = new Three.Scene(); 
-    scene.background = new Three.Color(0x88CCFF); 
-    scene.fog = new Three.FogExp2(0X4488CC, 0.01); 
+    scene.background = new Three.Color(0xCCCCCC); 
+    scene.fog = new Three.FogExp2(0X4488CC, 0.02); 
 
     const camera = new Three.PerspectiveCamera(75, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 1000); 
     camera.position.set(0, 2, wall_width / 2); 
@@ -69,26 +76,79 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // LIGHT
 
-    const hemi_light = new Three.HemisphereLight(0xFFFFFF, 1); 
-    scene.add(hemi_light); 
-
-    // GROUND
-
-    const ground = new Three.Mesh(new Three.PlaneGeometry(wall_width * 16, wall_width * 16), new Three.MeshBasicMaterial( { color: 0x00ff00 } )); 
-    ground.material.side = Three.DoubleSide; 
-    ground.position.set(wall_width * 8 - wall_width / 2, 0, wall_width * 8 - wall_width / 2); 
-    ground.rotation.x = - Math.PI / 2; 
-    scene.add(ground); 
+    const dir_light = new Three.DirectionalLight(0xFFFFFF, 1); 
+    dir_light.position.set(-4, 2, 4); 
+    dir_light.castShadow = true; 
+    scene.add(dir_light); 
 
     // ROOMS
 
-    const mat_wall = new Three.MeshBasicMaterial( { color: 0xccccee } ); 
-    mat_wall.side = Three.DoubleSide; 
-    const wall_template = new Three.Mesh(new Three.PlaneGeometry(wall_width * 0.99, wall_height * 0.99), mat_wall); 
+    // TEMPLATES
+    
+    // FLOOR
+    
+    const floor_template = new Three.Mesh(new Three.PlaneGeometry(wall_width, wall_width)); 
+    const floor_tex = texture_loader.load(floor_diff); 
+    floor_tex.wrapS = Three.RepeatWrapping; 
+    floor_tex.wrapT = Three.RepeatWrapping; 
+    floor_tex.repeat.set(10, 10); 
+    const floor_mat = new Three.MeshBasicMaterial({ map: floor_tex }); 
+    floor_template.material = floor_mat; 
+    floor_template.receiveShadow = true; 
+    
+    // WALL
+    
+    const wall_template = new Three.Mesh(new Three.PlaneGeometry(wall_width, wall_height)); 
 
+    // SOLID COLOR
+
+    const wall_mat = new Three.MeshBasicMaterial({ color: 0xCCCCCD }); 
+    
+    // USE TEXTURE
+    
+    // const wall_tex = texture_loader.load(wall_diff); 
+    // wall_tex.wrapS = Three.RepeatWrapping; 
+    // wall_tex.wrapT = Three.RepeatWrapping; 
+    // wall_tex.repeat.set(1 * wall_width / wall_height, 1); 
+    // const wall_mat = new Three.MeshBasicMaterial({ map: wall_tex }); 
+    
+    wall_mat.side = Three.DoubleSide; 
+    wall_template.material = wall_mat; 
+    // wall_template.castShadow = true; 
+    // wall_template.receiveShadow = true; 
+
+    // CEILING
+    
+    const ceil_template = new Three.Mesh(new Three.PlaneGeometry(wall_width, wall_width)); 
+    const ceil_tex = texture_loader.load(ceil_diff); 
+    ceil_tex.wrapS = Three.RepeatWrapping; 
+    ceil_tex.wrapT = Three.RepeatWrapping; 
+    ceil_tex.repeat.set(1, 1); 
+    const ceil_mat = new Three.MeshBasicMaterial({ map: ceil_tex }); 
+    ceil_mat.side = Three.BackSide; 
+    ceil_template.material = ceil_mat; 
+
+    // CREATE
+    
     for(let y = 0; y < palace.rooms.length; ++y) {
         for(let x = 0; x < palace.rooms[0].length; ++x) {
 
+            // FLOOR 
+
+            const floor = floor_template.clone(); 
+            floor.position.set(x * wall_width, 0, y * wall_width + 0.5 * wall_width); 
+            floor.rotation.y = Math.PI; 
+            floor.rotation.x = Math.PI / 2; 
+            scene.add(floor); 
+
+            // CEIL
+
+            const ceil = ceil_template.clone(); 
+            ceil.position.set(x * wall_width, wall_height, y * wall_width + 0.5 * wall_width); 
+            ceil.rotation.y = Math.PI; 
+            ceil.rotation.x = Math.PI / 2; 
+            scene.add(ceil); 
+            
             // WEST WALL
             
             if(x === 0 || !palace.rooms[y][x - 1].active || !palace.rooms[y][x].active) {
@@ -101,15 +161,16 @@ window.addEventListener('DOMContentLoaded', async () => {
             // NORTH WALL
             
             if(y === 0 || !palace.rooms[y - 1][x].active || !palace.rooms[y][x].active ) {
-                const mesh_wall = wall_template.clone(); 
-                mesh_wall.position.set(x * wall_width, wall_height / 2, y * wall_width); 
-                scene.add(mesh_wall); 
+                const north_wall = wall_template.clone(); 
+                north_wall.position.set(x * wall_width, wall_height / 2, y * wall_width); 
+                scene.add(north_wall); 
             }
 
             // LOCI
             
             const locus_id = palace.rooms[y][x].locus; 
             if(locus_id !== -1) {
+
                 const loci_length = 2.5; 
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0xff8888 }); 
                 const loci_mesh = new Three.Mesh(new Three.PlaneGeometry(loci_length, loci_length), mat_blue); 
@@ -120,18 +181,18 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const loci_height = 2.5; 
                 const in_front_offset = 0.01; 
                 if(y === 0 || !palace.rooms[y - 1][x]?.active) {
-                    loci_mesh.position.set(x * wall_width, loci_height, y * wall_width + 0.01); 
+                    loci_mesh.position.set(x * wall_width, loci_height, y * wall_width + in_front_offset); 
                 } else if(x === palace.rooms_per_side - 1 || !palace.rooms[y][x + 1]?.active) {
-                    loci_mesh.position.set(x * wall_width + 0.5 * wall_width - 0.01, loci_height, y * wall_width + 0.5 * wall_width); 
+                    loci_mesh.position.set(x * wall_width + 0.5 * wall_width - in_front_offset, loci_height, y * wall_width + 0.5 * wall_width); 
                     loci_mesh.rotation.y = -Math.PI / 2; 
                 } else if(y === palace.rooms_per_side - 1 || !palace.rooms[y + 1][x]?.active) {
-                    loci_mesh.position.set(x * wall_width, loci_height, (y + 1) * wall_width - 0.01); 
+                    loci_mesh.position.set(x * wall_width, loci_height, (y + 1) * wall_width - in_front_offset); 
                     loci_mesh.rotation.y = Math.PI; 
                 } else if(x === 0 || !palace.rooms[y][x - 1]?.active) {
-                    loci_mesh.position.set(x * wall_width - 0.5 * wall_width + 0.01, loci_height, y * wall_width + 0.5 * wall_width); 
+                    loci_mesh.position.set(x * wall_width - 0.5 * wall_width + in_front_offset, loci_height, y * wall_width + 0.5 * wall_width); 
                     loci_mesh.rotation.y = Math.PI / 2; 
                 } else {
-                    loci_mesh.position.set(x * wall_width, 0.01, y * wall_width + 0.5 * wall_width); 
+                    loci_mesh.position.set(x * wall_width, in_front_offset, y * wall_width + 0.5 * wall_width); 
                     loci_mesh.rotation.y = Math.PI; 
                     loci_mesh.rotation.x = Math.PI / 2; 
                 }
@@ -143,14 +204,15 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }; 
                 scene.add(loci_mesh); 
 
-                push_img_to_mesh(palace.loci[palace.locus_idx(locus_id)].handle, loci_mesh); 
+                push_handle_to_mesh(palace.loci[palace.locus_idx(locus_id)].handle, loci_mesh); 
             }
         }
     }
 
-    // LOAD IMG TO WALL
+    // LOAD IMG FROM HANDLE
+    // HANDLE COMES FROM OPFS
 
-    async function push_img_to_mesh(handle, mesh) {
+    async function push_handle_to_mesh(handle, mesh) {
         if(!handle || !mesh) {
             return; 
         }
@@ -167,7 +229,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             mnemonic_texture.wrapT = Three.RepeatWrapping; 
             mnemonic_texture.repeat.set( 1, 1 ); 
 
-            const mnemonic_material = new Three.MeshLambertMaterial( { map: mnemonic_texture } ); 
+            const mnemonic_material = new Three.MeshBasicMaterial( { map: mnemonic_texture } ); 
             mnemonic_material.side = Three.DoubleSide; 
             
             mesh.material = mnemonic_material; 
@@ -183,7 +245,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.activeElement.blur(); 
             
             if(dom_candidate_answer.innerText === targeted_locus.locus.memory) {
-                // push_img_to_mesh(targeted_locus.mem.handle, targeted_locus.mesh); 
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0x8888ff }); 
                 mat_blue.side = Three.DoubleSide; 
                 targeted_locus.mesh.material = mat_blue; 
@@ -242,10 +303,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             if(obstacle.object.name === 'locus') {
                 const locus_id = obstacle.object.custom.id; 
                 const locus = palace.loci.find(locus => locus.id === locus_id); 
-
-                // LOAD IMAGE TO MESH IMMEDIATELY
-                
-                // push_img_to_mesh(mem.handle, obstacle.object); 
 
                 targeted_locus.locus = locus; 
                 targeted_locus.mesh = obstacle.object; 

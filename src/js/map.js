@@ -326,8 +326,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }); 
 
     document.querySelector('.map').addEventListener('drop', drop => {
-        console.log(drop); 
-        
         const room = drop.target; 
         const id = +drop.dataTransfer.getData('text'); 
         if(
@@ -336,7 +334,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         ) {
             return; 
         }
-
+        
+        console.log('DROP EVENT', id, drop); 
+        
         palace.rooms[+room.getAttribute('row')][+room.getAttribute('column')].locus = id; 
         palace.persist(); 
         push_bg_img(palace.loci.find(locus => locus.id === id).handle, room); 
