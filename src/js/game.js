@@ -14,7 +14,6 @@ import '../css/game.css';
 // IMAGES 
 
 import floor_diff from '../tex/concrete_wall_001_diff_1k.jpg'; 
-import wall_diff from '../tex/white_sandstone_blocks_02_diff_1k.jpg'; 
 import ceil_diff from '../tex/white_plaster_02_diff_1k.jpg'; 
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -48,6 +47,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         mesh: null, 
         locus: null, 
     }; 
+
+    // PASSED TO TEST WHICH LOCI ARE IN VIEW
+    
+    let loci_pos = new Three.Vector3(); 
 
     const dom_candidate_answer = document.querySelector('.candidate-answer'); 
     
@@ -99,23 +102,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     // WALL
     
     const wall_template = new Three.Mesh(new Three.PlaneGeometry(wall_width, wall_height)); 
-
-    // SOLID COLOR
-
     const wall_mat = new Three.MeshBasicMaterial({ color: 0xCCCCCD }); 
-    
-    // USE TEXTURE
-    
-    // const wall_tex = texture_loader.load(wall_diff); 
-    // wall_tex.wrapS = Three.RepeatWrapping; 
-    // wall_tex.wrapT = Three.RepeatWrapping; 
-    // wall_tex.repeat.set(1 * wall_width / wall_height, 1); 
-    // const wall_mat = new Three.MeshBasicMaterial({ map: wall_tex }); 
-    
     wall_mat.side = Three.DoubleSide; 
     wall_template.material = wall_mat; 
-    // wall_template.castShadow = true; 
-    // wall_template.receiveShadow = true; 
 
     // CEILING
     
@@ -171,6 +160,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             const locus_id = palace.rooms[y][x].locus; 
             if(locus_id !== -1) {
 
+                // MATERIAL BLUE IS THERE AS A BACKUP
+                // WILL BE REPLACED BY THE TEXTURE AS LONG AS IT LOADS 
+                
                 const loci_length = 2.5; 
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0xff8888 }); 
                 const loci_mesh = new Three.Mesh(new Three.PlaneGeometry(loci_length, loci_length), mat_blue); 
@@ -203,6 +195,12 @@ window.addEventListener('DOMContentLoaded', async () => {
                     id: locus_id, 
                 }; 
                 scene.add(loci_mesh); 
+
+                if(x === 7 && y === 1) {
+                    loci_pos.x = loci_mesh.position.x; 
+                    loci_pos.y = loci_mesh.position.y; 
+                    loci_pos.z = loci_mesh.position.z; 
+                }
 
                 push_handle_to_mesh(palace.loci[palace.locus_idx(locus_id)].handle, loci_mesh); 
             }
@@ -248,6 +246,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0x8888ff }); 
                 mat_blue.side = Three.DoubleSide; 
                 targeted_locus.mesh.material = mat_blue; 
+                dom_candidate_answer.innerText = ''; 
             }
         }
     }); 
