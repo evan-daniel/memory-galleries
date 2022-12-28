@@ -48,16 +48,25 @@ window.addEventListener('DOMContentLoaded', async () => {
         locus: null, 
     }; 
 
-    // PASSED TO TEST WHICH LOCI ARE IN VIEW
-    
     let loci_pos = new Three.Vector3(); 
-
+    
     const dom_candidate_answer = document.querySelector('.candidate-answer'); 
+
+    // MINI-MAP
+    
+    const mini_map = document.querySelector('.mini-map-floor-plan').getContext('2d'); 
+    const mini_map_length = mini_map.canvas.height = mini_map.canvas.width = (mini_map.canvas.clientWidth - mini_map.canvas.clientWidth % palace.rooms_per_side) * window.devicePixelRatio; 
+    const mini_map_cell = mini_map_length / palace.rooms_per_side;
+    
+    const mini_map_player = document.querySelector('.mini-map-player').getContext('2d'); 
+    mini_map_player.canvas.width = mini_map_player.canvas.height = mini_map_length; 
+
+    const world_to_mini_map_scale = coord => (coord / (palace.rooms_per_side * wall_width)) * mini_map_length; 
     
     // INIT
     
     const renderer = new Three.WebGLRenderer({ 
-        canvas: document.querySelector('canvas'), 
+        canvas: document.querySelector('canvas.game'), 
         antialias: true, 
     }); 
     console.log('RENDERER', renderer); 
@@ -206,7 +215,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
                 push_handle_to_mesh(palace.loci[palace.locus_idx(locus_id)].handle, loci_mesh); 
             }
+
+            // MINI-MAP
+
+            if(palace.rooms[y][x].active) {
+                mini_map.fillStyle = palace.rooms[y][x].locus === -1 ? '#777' : '#38C038'; 
+                mini_map.fillRect(x * mini_map_cell, y * mini_map_cell, mini_map_cell, mini_map_cell); 
+            }
         }
+
+
     }
 
     // LOAD IMG FROM HANDLE
@@ -241,14 +259,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     // USER WRITES MEMORY CONTENT
     
     dom_candidate_answer.addEventListener('keydown', async keydown => {
-        if(keydown.key === 'Enter') {
+        if(keydown.key === 'Enter' || keydown.key === 'Return') {
             document.activeElement.blur(); 
+            
+            // CORRECT ANSWER
             
             if(dom_candidate_answer.innerText === targeted_locus.locus.memory) {
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0x8888ff }); 
                 mat_blue.side = Three.DoubleSide; 
                 targeted_locus.mesh.material = mat_blue; 
                 dom_candidate_answer.innerText = ''; 
+                
+                mini_map.fillStyle = '#00F'; 
+                mini_map.fillRect(world_to_mini_map_scale(targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)), world_to_mini_map_scale(targeted_locus.mesh.position.z - (targeted_locus.mesh.position.z % wall_width)), mini_map_cell, mini_map_cell); 
             }
         }
     }); 
@@ -375,12 +398,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         dom_ans.style.display = 'none'; 
         for(let obstacle of collisions) {
             if(obstacle.object.name === 'locus') {
-                // const locus_id = obstacle.object.custom.id; 
-                // const locus = palace.loci.find(locus => locus.id === locus_id); 
-
-                // targeted_locus.mesh = obstacle.object; 
-
-                
                 const projection = new Three.Vector3(obstacle.object.position.x, obstacle.object.position.y, obstacle.object.position.z); 
                 projection.project(camera); 
                 dom_ans.style.display = 'block'; 
@@ -389,6 +406,23 @@ window.addEventListener('DOMContentLoaded', async () => {
                 
             }
         }; 
+
+        // MINI-MAP
+
+        mini_map_player.clearRect(0, 0, mini_map_length, mini_map_length); 
+        mini_map_player.fillStyle = '#fff'; 
+        // mini_map_player.fillRect(world_to_mini_map_scale(camera.position.x) + 6, world_to_mini_map_scale(camera.position.z) - 3, 6, 6); 
+        const x = world_to_mini_map_scale(camera.position.x); 
+        const y = world_to_mini_map_scale(camera.position.z); 
+        mini_map_player.translate(x + mini_map_cell / 3, y); 
+        mini_map_player.rotate(-camera.rotation.y - Math.PI / 2); 
+        mini_map_player.beginPath(); 
+        mini_map_player.moveTo(0, -mini_map_cell / 3); 
+        mini_map_player.lineTo(0, mini_map_cell / 3); 
+        mini_map_player.lineTo(mini_map_cell, 0); 
+        mini_map_player.closePath(); 
+        mini_map_player.fill(); 
+        mini_map_player.setTransform(1, 0, 0, 1, 0, 0); 
         
 
         // RENDER
