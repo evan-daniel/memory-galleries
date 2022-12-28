@@ -60,6 +60,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         canvas: document.querySelector('canvas'), 
         antialias: true, 
     }); 
+    console.log('RENDERER', renderer); 
     renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight); 
     renderer.setPixelRatio(window.devicePixelRatio); 
     renderer.shadowMap.enabled = true; 
@@ -105,6 +106,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const wall_mat = new Three.MeshBasicMaterial({ color: 0xCCCCCD }); 
     wall_mat.side = Three.DoubleSide; 
     wall_template.material = wall_mat; 
+    wall_template.name = 'wall'; 
 
     // CEILING
     
@@ -354,6 +356,40 @@ window.addEventListener('DOMContentLoaded', async () => {
         if(document.pointerLockElement === renderer.domElement) {
             push_movement(); 
         }
+
+        // RAYCAST FOR LOCUS
+
+        let v = new Three.Vector3(1, 0, 0); 
+
+        v.applyAxisAngle(new Three.Vector3(0, 1, 0), camera.rotation.y); 
+        v = new Three.Vector3(camera.rotation.x, camera.rotation.y, camera.rotation.z); 
+
+        const rayO = new Three.Vector3(); 
+        camera.getWorldPosition(rayO); 
+
+        const raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3, 0, 25);
+        raycaster.setFromCamera(new Three.Vector2(0, 0), camera); 
+        const collisions = raycaster.intersectObjects(scene.children, true); 
+
+        const dom_ans = document.querySelector('.answer'); 
+        dom_ans.style.display = 'none'; 
+        for(let obstacle of collisions) {
+            if(obstacle.object.name === 'locus') {
+                // const locus_id = obstacle.object.custom.id; 
+                // const locus = palace.loci.find(locus => locus.id === locus_id); 
+
+                // targeted_locus.mesh = obstacle.object; 
+
+                
+                const projection = new Three.Vector3(obstacle.object.position.x, obstacle.object.position.y, obstacle.object.position.z); 
+                projection.project(camera); 
+                dom_ans.style.display = 'block'; 
+                dom_ans.style.top = `${(-projection.y + 1) * renderer.domElement.height / 2}px`; 
+                dom_ans.style.left = `${(projection.x + 1) * renderer.domElement.width / 2}px`; 
+                
+            }
+        }; 
+        
 
         // RENDER
 
