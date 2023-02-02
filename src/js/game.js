@@ -42,6 +42,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     const wall_width = 10; 
     const wall_height = 5; 
+    const loci_length = 2.5; 
 
     let targeted_locus = {
         mesh: null, 
@@ -174,7 +175,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 // MATERIAL BLUE IS THERE AS A BACKUP
                 // WILL BE REPLACED BY THE TEXTURE AS LONG AS IT LOADS 
                 
-                const loci_length = 2.5; 
                 const mat_blue = new Three.MeshBasicMaterial( { color: 0xff8888 }); 
                 const loci_mesh = new Three.Mesh(new Three.PlaneGeometry(loci_length, loci_length), mat_blue); 
                 loci_mesh.material.side = Three.DoubleSide; 
@@ -272,6 +272,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 
                 mini_map.fillStyle = '#00F'; 
                 mini_map.fillRect(world_to_mini_map_scale(targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)), world_to_mini_map_scale(targeted_locus.mesh.position.z - (targeted_locus.mesh.position.z % wall_width)), mini_map_cell, mini_map_cell); 
+                console.log('MINI MAP', targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)); 
             }
         }
     }); 
