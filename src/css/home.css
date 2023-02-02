@@ -43,7 +43,7 @@ body {
 .cta-content, 
 .introduction-content {
     flex: 0 0 calc(100 * var(--vmin)); 
-    height: calc(100 * var(--vh)); 
+    /* height: calc(100 * var(--vh));  */
 }
 
 /* HERO */
@@ -303,4 +303,34 @@ body {
     display: flex; 
     justify-content: center;
     align-items: center;
+}
+
+/* SCREEN WARNING */
+
+.device-warning {
+    height: calc(16 * var(--c)); 
+    padding: var(--c); 
+    
+    text-align: center; 
+    font-size: 2rem; 
+    font-weight: 900; 
+    color: #f44; 
+    
+    display: none; 
+    justify-content: center;
+    align-items: center;
+}
+
+@media(max-aspect-ratio: 1 / 1) {
+    .device-warning {
+        display: flex; 
+    }
+    
+    .cta {
+        display: none; 
+    }
+
+    .palaces {
+        display: none; 
+    }
 }

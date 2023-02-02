@@ -1,6 +1,7 @@
 /* BODY FULL SCREEN */
 
 body {
+    /* touch-action: none;  */
     height: 100vh; 
 }
 
