@@ -166,6 +166,11 @@ body {
     border-bottom: 2px solid var(--theme-color); 
 }
 
+.push_locus-modal-memory-candidate, 
+.push_locus-modal-mnemonic-candidate {
+    max-width: 100%; 
+}
+
 .push_locus-modal-custom-instruction-headline {
     margin: var(--c) 0 0; 
 }

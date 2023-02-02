@@ -55,12 +55,11 @@ body {
     position: fixed; 
     bottom: 1rem; 
     left: 1rem; 
-    height: calc(12 * var(--c)); 
-    width: calc(24 * var(--c)); 
+    width: calc(16 * var(--c)); 
 }
 
 .candidate-answer {
-    height: 5rem; 
+    height: calc(8 * var(--c)); 
     margin: 1rem; 
     padding: 1rem;
     

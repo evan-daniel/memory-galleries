@@ -401,8 +401,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const projection = new Three.Vector3(obstacle.object.position.x, obstacle.object.position.y, obstacle.object.position.z); 
                 projection.project(camera); 
                 dom_ans.style.display = 'block'; 
-                dom_ans.style.top = `${(-projection.y + 1) * renderer.domElement.height / 2}px`; 
-                dom_ans.style.left = `${(projection.x + 1) * renderer.domElement.width / 2}px`; 
+                dom_ans.style.top = `${(-projection.y + 1) * renderer.domElement.height / 2 / window.devicePixelRatio}px`; 
+                dom_ans.style.left = `${(projection.x + 1) * renderer.domElement.width / 2 / window.devicePixelRatio}px`; 
                 
             }
         }; 
