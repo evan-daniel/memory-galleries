@@ -271,8 +271,9 @@ window.addEventListener('DOMContentLoaded', async () => {
                 dom_candidate_answer.innerText = ''; 
                 
                 mini_map.fillStyle = '#00F'; 
-                mini_map.fillRect(world_to_mini_map_scale(targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)), world_to_mini_map_scale(targeted_locus.mesh.position.z - (targeted_locus.mesh.position.z % wall_width)), mini_map_cell, mini_map_cell); 
-                console.log('MINI MAP', targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)); 
+                console.log('TAR LOC', targeted_locus); 
+                mini_map.fillRect(world_to_mini_map_scale(targeted_locus.mesh.position.x + wall_width / 2 - ((targeted_locus.mesh.position.x + wall_width / 2) % wall_width)), world_to_mini_map_scale(targeted_locus.mesh.position.z - (targeted_locus.mesh.position.z % wall_width)), mini_map_cell, mini_map_cell); 
+                console.log('OFFSET CHECK', targeted_locus.mesh.position.x, targeted_locus.mesh.position.x % wall_width, targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)); 
             }
         }
     }); 
