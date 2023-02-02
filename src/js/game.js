@@ -331,6 +331,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 targeted_locus.locus = locus; 
                 targeted_locus.mesh = obstacle.object; 
                 dom_candidate_answer.focus(); 
+                break; 
             }
         }; 
     }); 
@@ -338,8 +339,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderer.domElement.addEventListener('mousemove', mousemove => {
         if(document.pointerLockElement === renderer.domElement && !document.activeElement.classList.contains('candidate-answer')) {
             const rot_speed = 1 / 256; 
-            camera.rotation.y -= mousemove.movementX * rot_speed; 
-            camera.rotation.x -= mousemove.movementY * rot_speed; 
+            camera.rotation.y -= mousemove.movementX / window.devicePixelRatio * rot_speed; 
+            camera.rotation.x -= mousemove.movementY / window.devicePixelRatio * rot_speed; 
         }
     }); 
 
@@ -403,7 +404,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 dom_ans.style.display = 'block'; 
                 dom_ans.style.top = `${(-projection.y + 1) * renderer.domElement.height / 2 / window.devicePixelRatio}px`; 
                 dom_ans.style.left = `${(projection.x + 1) * renderer.domElement.width / 2 / window.devicePixelRatio}px`; 
-                
+                break; 
             }
         }; 
 
@@ -424,7 +425,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         mini_map_player.fill(); 
         mini_map_player.setTransform(1, 0, 0, 1, 0, 0); 
         
-
         // RENDER
 
         window.requestAnimationFrame(animate); 
