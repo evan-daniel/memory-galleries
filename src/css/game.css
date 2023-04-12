@@ -60,12 +60,14 @@ body {
 }
 
 .candidate-answer {
-    height: calc(8 * var(--c)); 
+    max-height: calc(16 * var(--c)); 
     margin: 1rem; 
     padding: 1rem;
     
     overflow: hidden; 
     
+    font-family: 'Baskerville', serif; 
+    font-size: 0.75rem; 
     background-color: #CCFC; 
     
     border-radius: 1rem; 

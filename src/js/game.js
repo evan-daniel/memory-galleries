@@ -53,6 +53,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     const dom_candidate_answer = document.querySelector('.candidate-answer'); 
 
+    let voices; 
+    window.speechSynthesis.onvoiceschanged = () => voices = window.speechSynthesis.getVoices(); 
+
     // MINI-MAP
     
     const mini_map = document.querySelector('.mini-map-floor-plan').getContext('2d'); 
@@ -259,23 +262,58 @@ window.addEventListener('DOMContentLoaded', async () => {
     // USER WRITES MEMORY CONTENT
     
     dom_candidate_answer.addEventListener('keydown', async keydown => {
-        if(keydown.key === 'Enter' || keydown.key === 'Return') {
-            document.activeElement.blur(); 
+        console.log(keydown); 
+        
+        if(keydown.ctrlKey) {
             
-            // CORRECT ANSWER
+            if(keydown.code === 'KeyU') {
+                keydown.preventDefault(); 
+                dom_candidate_answer.innerText = targeted_locus.locus.memory; 
+            }
+    
+            if(keydown.code === 'KeyS') {
+                keydown.preventDefault(); 
+                palace.set_locus_memory(targeted_locus.locus.id, dom_candidate_answer.innerText); 
+                palace.persist(); 
+            }
             
-            if(dom_candidate_answer.innerText === targeted_locus.locus.memory) {
-                const mat_blue = new Three.MeshBasicMaterial( { color: 0x8888ff }); 
-                mat_blue.side = Three.DoubleSide; 
-                targeted_locus.mesh.material = mat_blue; 
-                dom_candidate_answer.innerText = ''; 
+            if(keydown.code === 'Enter' || keydown.code === 'Return') {
+                keydown.preventDefault(); 
+                    
+                const pulse_speech = () => {
+                    console.log('PULSING SPEECH'); 
+                    window.speechSynthesis.pause(); 
+                    window.speechSynthesis.resume(); 
+                }
                 
-                mini_map.fillStyle = '#00F'; 
-                console.log('TAR LOC', targeted_locus); 
-                mini_map.fillRect(world_to_mini_map_scale(targeted_locus.mesh.position.x + wall_width / 2 - ((targeted_locus.mesh.position.x + wall_width / 2) % wall_width)), world_to_mini_map_scale(targeted_locus.mesh.position.z - (targeted_locus.mesh.position.z % wall_width)), mini_map_cell, mini_map_cell); 
-                console.log('OFFSET CHECK', targeted_locus.mesh.position.x, targeted_locus.mesh.position.x % wall_width, targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)); 
+                window.speechSynthesis.cancel(); 
+                const speech_pulse = window.setInterval(pulse_speech, 10000); 
+                const msg = new SpeechSynthesisUtterance(); 
+                msg.voice = voices[146]; 
+                msg.text = dom_candidate_answer.innerText; 
+                msg.onend = () => window.clearInterval(speech_pulse); 
+                msg.onerror = () => window.clearInterval(speech_pulse); 
+                window.speechSynthesis.speak(msg); 
             }
         }
+        
+        // if(keydown.key === 'Enter' || keydown.key === 'Return') {
+            // document.activeElement.blur(); 
+            
+            // // CORRECT ANSWER
+            
+            // if(dom_candidate_answer.innerText === targeted_locus.locus.memory) {
+            //     const mat_blue = new Three.MeshBasicMaterial( { color: 0x8888ff }); 
+            //     mat_blue.side = Three.DoubleSide; 
+            //     targeted_locus.mesh.material = mat_blue; 
+            //     dom_candidate_answer.innerText = ''; 
+                
+            //     mini_map.fillStyle = '#00F'; 
+            //     console.log('TAR LOC', targeted_locus); 
+            //     mini_map.fillRect(world_to_mini_map_scale(targeted_locus.mesh.position.x + wall_width / 2 - ((targeted_locus.mesh.position.x + wall_width / 2) % wall_width)), world_to_mini_map_scale(targeted_locus.mesh.position.z - (targeted_locus.mesh.position.z % wall_width)), mini_map_cell, mini_map_cell); 
+            //     console.log('OFFSET CHECK', targeted_locus.mesh.position.x, targeted_locus.mesh.position.x % wall_width, targeted_locus.mesh.position.x - (targeted_locus.mesh.position.x % wall_width)); 
+            // }
+        // }
     }); 
 
     // KEYBOARD
@@ -406,6 +444,11 @@ window.addEventListener('DOMContentLoaded', async () => {
                 dom_ans.style.display = 'block'; 
                 dom_ans.style.top = `${(-projection.y + 1) * renderer.domElement.height / 2 / window.devicePixelRatio}px`; 
                 dom_ans.style.left = `${(projection.x + 1) * renderer.domElement.width / 2 / window.devicePixelRatio}px`; 
+
+                // const locus_id = obstacle.object.custom.id; 
+                // const locus = palace.loci.find(locus => locus.id === locus_id); 
+                // dom_candidate_answer.innerText = locus.memory; 
+                
                 break; 
             }
         }; 
