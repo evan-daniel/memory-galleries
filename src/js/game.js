@@ -1,6 +1,7 @@
 // LIB
 
 import * as Three from 'three'; 
+import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js'; 
 
 // OO
 
@@ -44,6 +45,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const wall_height = 5; 
     const loci_length = 2.5; 
 
+    let dom_obj; 
+
     let targeted_locus = {
         mesh: null, 
         locus: null, 
@@ -79,9 +82,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderer.shadowMap.enabled = true; 
     renderer.shadowMap.type = Three.PCFSoftShadowMap; 
 
+    const renderer2 = new CSS3DRenderer();
+    renderer2.setSize(window.innerWidth, window.innerHeight);
+    renderer2.domElement.style.position = 'absolute';
+    renderer2.domElement.style.top = 0;
+    document.body.appendChild(renderer2.domElement);
+
     const scene = new Three.Scene(); 
     scene.background = new Three.Color(0xCCCCCC); 
     scene.fog = new Three.FogExp2(0X4488CC, 0.02); 
+
+    const scene2 = new Three.Scene(); 
 
     const camera = new Three.PerspectiveCamera(75, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 1000); 
     camera.position.set(0, 2, wall_width / 2); 
@@ -178,19 +189,26 @@ window.addEventListener('DOMContentLoaded', async () => {
                 // MATERIAL BLUE IS THERE AS A BACKUP
                 // WILL BE REPLACED BY THE TEXTURE AS LONG AS IT LOADS 
                 
-                const mat_blue = new Three.MeshBasicMaterial( { color: 0xff8888 }); 
-                const loci_mesh = new Three.Mesh(new Three.PlaneGeometry(loci_length, loci_length), mat_blue); 
-                loci_mesh.material.side = Three.DoubleSide; 
+                const mat_blue = new Three.MeshBasicMaterial({
+                    opacity: 0.001,
+                    color: new Three.Color(0x000000),
+                    blending: Three.NoBlending,
+                    side: Three.DoubleSide
+                });
+                const loci_mesh = new Three.Object3D(); 
+                const loci_m = new Three.Mesh(new Three.PlaneGeometry(loci_length, loci_length), mat_blue); 
+                loci_m.material.side = Three.DoubleSide; 
 
                 // POSITION IN ROOM BASED ON WHERE THERE ARE WALLS
                 
                 const loci_height = 2.5; 
                 const in_front_offset = 0.01; 
                 if(y === 0 || !palace.rooms[y - 1][x]?.active) {
-                    loci_mesh.position.set(x * wall_width, loci_height, y * wall_width + in_front_offset); 
-                } else if(x === palace.rooms_per_side - 1 || !palace.rooms[y][x + 1]?.active) {
+                    // loci_mesh.position.set(x * wall_width, loci_height, y * wall_width + wall_width/4 + in_front_offset); 
                     loci_mesh.position.set(x * wall_width + 0.5 * wall_width - in_front_offset, loci_height, y * wall_width + 0.5 * wall_width); 
                     loci_mesh.rotation.y = -Math.PI / 2; 
+                    // loci_mesh.rotation.y = -Math.PI / 2; 
+                } else if(x === palace.rooms_per_side - 1 || !palace.rooms[y][x + 1]?.active) {
                 } else if(y === palace.rooms_per_side - 1 || !palace.rooms[y + 1][x]?.active) {
                     loci_mesh.position.set(x * wall_width, loci_height, (y + 1) * wall_width - in_front_offset); 
                     loci_mesh.rotation.y = Math.PI; 
@@ -208,7 +226,22 @@ window.addEventListener('DOMContentLoaded', async () => {
                 loci_mesh.custom = {
                     id: locus_id, 
                 }; 
-                scene.add(loci_mesh); 
+
+                // TEXT DOM
+
+                dom_obj = document.createElement('div'); 
+                dom_obj.innerText = 'ARBITRARY'; 
+                dom_obj.classList.add('dom_obj'); 
+                dom_obj.contentEditable = 'true'; 
+
+                const dom_obj_css3d = new CSS3DObject(dom_obj); 
+                dom_obj_css3d.type = 'WP'; 
+
+                loci_mesh.CSS3DObject = dom_obj_css3d; 
+                loci_mesh.add(dom_obj_css3d); 
+                loci_mesh.scale.multiplyScalar(0.03); 
+
+                scene2.add(loci_mesh); 
 
                 if(x === 7 && y === 1) {
                     loci_pos.x = loci_mesh.position.x; 
@@ -216,7 +249,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                     loci_pos.z = loci_mesh.position.z; 
                 }
 
-                push_handle_to_mesh(palace.loci[palace.locus_idx(locus_id)].handle, loci_mesh); 
+                // push_handle_to_mesh(palace.loci[palace.locus_idx(locus_id)].handle, loci_mesh); 
             }
 
             // MINI-MAP
@@ -233,6 +266,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     // LOAD IMG FROM HANDLE
     // HANDLE COMES FROM OPFS
 
+    const canvas_2d = document.createElement('canvas'); 
+    canvas_2d.height = canvas_2d.width = 1024; 
+    const canvas_renderer = canvas_2d.getContext('2d'); 
+    
+    const canvas_texture = new Three.CanvasTexture(canvas_2d); 
+    
     async function push_handle_to_mesh(handle, mesh) {
         if(!handle || !mesh) {
             return; 
@@ -245,15 +284,24 @@ window.addEventListener('DOMContentLoaded', async () => {
 
             // SET UP NEW MATERIAL
             
-            const mnemonic_texture = texture_loader.load(res); 
-            mnemonic_texture.wrapS = Three.RepeatWrapping; 
-            mnemonic_texture.wrapT = Three.RepeatWrapping; 
-            mnemonic_texture.repeat.set( 1, 1 ); 
+            // const mnemonic_texture = texture_loader.load(res); 
+            // mnemonic_texture.wrapS = Three.RepeatWrapping; 
+            // mnemonic_texture.wrapT = Three.RepeatWrapping; 
+            // mnemonic_texture.repeat.set( 1, 1 ); 
 
-            const mnemonic_material = new Three.MeshBasicMaterial( { map: mnemonic_texture } ); 
-            mnemonic_material.side = Three.DoubleSide; 
+            // const mnemonic_material = new Three.MeshBasicMaterial( { map: canvas_texture } ); 
+            // mnemonic_material.side = Three.DoubleSide; 
             
-            mesh.material = mnemonic_material; 
+            // mesh.material = mnemonic_material; 
+
+            mesh.material = new Three.MeshBasicMaterial({
+                opacity: 0.001,
+                color: new Three.Color(0x000000),
+                blending: Three.NoBlending,
+                side: Three.DoubleSide
+            }); 
+            
+
         }); 
         file_reader.readAsDataURL(mnemonic_file); 
 
@@ -261,7 +309,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // USER WRITES MEMORY CONTENT
     
-    dom_candidate_answer.addEventListener('keydown', async keydown => {
+    document.addEventListener('keydown', async keydown => {
         console.log(keydown); 
         
         if(keydown.ctrlKey) {
@@ -341,12 +389,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // CLICK 
 
-    renderer.domElement.addEventListener('click', () => {
+    renderer2.domElement.addEventListener('click', () => {
 
         // LOCK POINTER, RETURN
         
-        if(document.pointerLockElement !== renderer.domElement) {
-            renderer.domElement.requestPointerLock(); 
+        if(document.pointerLockElement !== renderer2.domElement) {
+            renderer2.domElement.requestPointerLock(); 
             return; 
         }
 
@@ -376,8 +424,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         }; 
     }); 
 
-    renderer.domElement.addEventListener('mousemove', mousemove => {
-        if(document.pointerLockElement === renderer.domElement && !document.activeElement.classList.contains('candidate-answer')) {
+    renderer2.domElement.addEventListener('mousemove', mousemove => {
+        if(document.pointerLockElement === renderer2.domElement && !document.activeElement.classList.contains('candidate-answer')) {
             const rot_speed = 1 / 256; 
             camera.rotation.y -= mousemove.movementX / window.devicePixelRatio * rot_speed; 
             camera.rotation.x -= mousemove.movementY / window.devicePixelRatio * rot_speed; 
@@ -415,9 +463,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // ANIMATE
 
+    let x_2d = 0; 
+
     const animate = () => {
 
-        if(document.pointerLockElement === renderer.domElement) {
+        if(document.pointerLockElement === renderer2.domElement) {
             push_movement(); 
         }
 
@@ -445,10 +495,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 dom_ans.style.top = `${(-projection.y + 1) * renderer.domElement.height / 2 / window.devicePixelRatio}px`; 
                 dom_ans.style.left = `${(projection.x + 1) * renderer.domElement.width / 2 / window.devicePixelRatio}px`; 
 
-                // const locus_id = obstacle.object.custom.id; 
-                // const locus = palace.loci.find(locus => locus.id === locus_id); 
-                // dom_candidate_answer.innerText = locus.memory; 
-                
                 break; 
             }
         }; 
@@ -469,11 +515,42 @@ window.addEventListener('DOMContentLoaded', async () => {
         mini_map_player.closePath(); 
         mini_map_player.fill(); 
         mini_map_player.setTransform(1, 0, 0, 1, 0, 0); 
+
+        // ANIMATED CANVAS TEXTURE 
+        
+        canvas_texture.needsUpdate = true; 
         
         // RENDER
 
         window.requestAnimationFrame(animate); 
         renderer.render(scene, camera); 
+
+        // 2D CANVAS
+
+        
+        canvas_renderer.clearRect(0, 0, canvas_2d.width, canvas_2d.height); 
+    
+        x_2d += 0.1; 
+        
+        canvas_renderer.fillStyle = '#00F'; 
+        canvas_renderer.rect(10, 20, 512 + x_2d, 100);
+        canvas_renderer.fill();
+    
+        canvas_renderer.rect(10, 150, 512 - x_2d, 100);
+        canvas_renderer.fillStyle = '#F00'; 
+        canvas_renderer.fill();
+
+        renderer2.render(scene2, camera); 
+    
     }; 
     window.requestAnimationFrame(animate); 
 }); 
+
+/*
+
+My practice is about encoding games.  
+Artists frequently set rules for themselves as they create work.  As a professor of mine at RISD said, in order to work, the first thing you have to do is limit your freedom.  Whether that holds as a general maxim, within my work the process of 
+
+creating rules for what I do has been central.  Similarly, artists often have experience with the idea that both the rules they make and the output of following them are voices within the artistic process.  
+
+*/
