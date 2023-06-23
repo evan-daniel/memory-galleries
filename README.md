@@ -1,8 +1,8 @@
-# lociai.com
+# memorygalleries.com
 
-This is source code for [lociai.com](https://lociai.com).  
+This is source code for [memorygalleries.com](https://memorygalleries.com).  
 
-For documentation, see [https://evandaniel.com/loci_ai](https://evandaniel.com/loci_ai).  
+For documentation, see [https://evandaniel.com/memory_galleries](https://evandaniel.com/memory_galleries).  
 
 ## Structure 
 
