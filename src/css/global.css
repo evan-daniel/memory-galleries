@@ -176,38 +176,35 @@ img {
 .brand-first-word {
     height: calc(8 * var(--c)); 
     width: calc(8 * var(--c)); 
+
+    font-size: 1.2rem; 
+
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
 }
 
 .brand-first-word {
-    font-size: 4rem; 
     font-family: var(--rm); 
 
-    display: flex; 
-    flex-wrap: wrap;
-}
-
-.brand-first-word-letter {
-    flex: 1 1 50%; 
-    height: calc(4 * var(--c)); 
+    background-image: linear-gradient(to bottom, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-negative) 50%, var(--theme-color-negative) 100%); 
     
-    display: flex; 
-    justify-content: center; 
-    align-items: flex-end;
-}
-
-.brand-first-word-letter:nth-of-type(1), 
-.brand-first-word-letter:nth-of-type(4) {
-    background-color: #0f08; 
 }
 
 .brand-second-word {
-    font-size: 6rem; 
     font-family: var(--tt); 
     background-color: #0f08; 
+    
+    background-image: linear-gradient(to top, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-negative) 50%, var(--theme-color-negative) 100%); 
+}
+
+.brand-word-container {
+    height: calc(4 * var(--c)); 
 
     display: flex; 
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center;
+    align-items: center;
 }
 
 .tagline {

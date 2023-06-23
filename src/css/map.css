@@ -40,10 +40,11 @@ body {
     font-size: 0.5rem; 
     font-family: var(--tt); 
     color: #fff; 
+    text-align: center; 
     
     display: flex; 
-    justify-content: flex-end; 
-    align-items: flex-end; 
+    justify-content: center; 
+    align-items: center; 
 }
 
 .header-local {
