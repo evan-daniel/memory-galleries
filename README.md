@@ -2,20 +2,26 @@
 
 This is source code for [memorygalleries.com](https://memorygalleries.com).  
 
-For documentation, see [https://evandaniel.com/memory_galleries](https://evandaniel.com/memory_galleries).  
-
 ## Structure 
 
-The site uses webpack for standardization purposes.  Frameworks were decided against since the structure of the site is simple, but the API usage was more complex.  
+- Webpack is used for organization.  
+- Local storage is used to persist user "galleries".  
+- The Origin Private File System (OPFS) is used to store images.  
+- Three.js is used to translate images and data into a 3D world. 
+- Physics elements (movement, collision detection) are simple and built from scratch.  
+- OpenAI Dall•E API is used for image generation (images can also be uploaded).  
 
-### Storage 
+## Concept 
 
-Local storage was used to persist user data, which is wrangled using a single class.  One of the biggest questions was how to store images that would persist across visits to the site without the use of a database.  The decision was made to leverage an API introduced to Chromium browsers in 2022, the Origin Private File System (OPFS).  This virtual filesystem stores and saves image data locally.  
+The idea behind this project is "populate a memory palace using AI-generated images."  
 
-### Three.js
+The "Memory Palace" technique dates back to ancient Greece ("The Method of Loci"), and is still used today by memory competition champions.  The procedure is to associate items you want to memorize with striking images placed in a physical space.  
 
-The site translates a 2D map into a 3D world.  Because custom effects are not needed (i.e. via WebGL), Three.js was leveraged.  Since the emphasis of the game is navigation and interactivity over narrative elements, the game engine (comprised of a navigation system with collision detection and raycasting) was built from scratch.  The textures are simple; intended to replicate the feeling of a gallery.  
+In this version, the "palace" is called a "gallery": 
+- Users draw the floor plan.  
+- They type in what they want to memorize and a vivid image to help them remember it.  The image is created by the OpenAI API.  
+- When they start the game itself, a 3D gallery is generated based on their floor plan, with the images represented as "paintings".  Users can test themselves by typing in the content they wish to remember. 
 
-### AI 
+![Floor Plan Interface](https://github.com/evan-daniel/memory-galleries/blob/master/memory-galleries-floor-plan.png) 
 
-An integral component of the site's functionality is the ability to compose a gallery on-the-fly.  The decision was made to leverage OpenAI's DALL•E API.  The request is sent from the Nodejs backend.  The file is retrieved and then stored locally to simplify development, and to avoid storing user passwords and files remotely, which has attendant privacy and legal issues.  A key affordance was made by including the ability to download images; this invites users to store and transfer their data themselves.  
+![Game Interface](https://github.com/evan-daniel/memory-galleries/blob/master/memory-galleries-pic.png) 
